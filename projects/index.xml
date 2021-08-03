@@ -5,6 +5,79 @@
     <link>https://flicksfix.com/projects/</link>
     <description>Recent content in Projects on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://flicksfix.com/projects/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <lastBuildDate>Wed, 30 Dec 2020 00:00:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/projects/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>tfui</title>
+      <link>https://flicksfix.com/projects/tfui/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/tfui/</guid>
+      <description>Interactive terraform console UI for managing state (mainly renaming variables)</description>
+    </item>
+    
+    <item>
+      <title>Gemrabot</title>
+      <link>https://flicksfix.com/projects/gemrabot/</link>
+      <pubDate>Sat, 29 Aug 2020 00:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/gemrabot/</guid>
+      <description>Gitlab Merge Request Bot that allows interactive approval using slack (ChatOps)</description>
+    </item>
+    
+    <item>
+      <title>Threedverse</title>
+      <link>https://flicksfix.com/projects/threedverse/</link>
+      <pubDate>Fri, 12 Jun 2020 00:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/threedverse/</guid>
+      <description>My attempt to make alternative for hosting 3D printing content (*.stl)</description>
+    </item>
+    
+    <item>
+      <title>paperless (fork)</title>
+      <link>https://flicksfix.com/projects/paperless-fork/</link>
+      <pubDate>Sat, 15 Feb 2020 10:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/paperless-fork/</guid>
+      <description>My FORK of paperless which adds Azure OCR service for better OCR</description>
+    </item>
+    
+    <item>
+      <title>Scooter-Board-MCU</title>
+      <link>https://flicksfix.com/projects/scooter-board-mcu/</link>
+      <pubDate>Tue, 29 Oct 2019 00:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/scooter-board-mcu/</guid>
+      <description>My attempt on reverse engineering Xiaomi M365 scooter UART communication</description>
+    </item>
+    
+    <item>
+      <title>langenv (concept)</title>
+      <link>https://flicksfix.com/projects/langenv/</link>
+      <pubDate>Sun, 05 Aug 2018 17:50:17 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/langenv/</guid>
+      <description>Concept of making a universal language management tool</description>
+    </item>
+    
+    <item>
+      <title>arduino-fft-visualizer</title>
+      <link>https://flicksfix.com/projects/arduino-visualizer/</link>
+      <pubDate>Sat, 09 May 2015 09:40:23 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/arduino-visualizer/</guid>
+      <description>Ancient project for making LEDs flash according to given frequency played in my speaker using FFT</description>
+    </item>
+    
+    <item>
+      <title>Trellobot</title>
+      <link>https://flicksfix.com/projects/trellobot/</link>
+      <pubDate>Fri, 18 Apr 2014 09:23:30 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/projects/trellobot/</guid>
+      <description>My oldest public project, a bot which sends notifications about terllo events on slack</description>
+    </item>
+    
   </channel>
 </rss>
