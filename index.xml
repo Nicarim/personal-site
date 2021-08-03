@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Writing about code, electronics and other stuff</title>
+    <link>https://flicksfix.com/</link>
+    <description>Recent content on Writing about code, electronics and other stuff</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 02 Aug 2021 14:19:32 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>First Post</title>
+      <link>https://flicksfix.com/posts/first-post/</link>
+      <pubDate>Mon, 02 Aug 2021 14:19:32 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/first-post/</guid>
+      <description>How you doing
+This is first entry in here, testing how it works.</description>
+    </item>
+    
+  </channel>
+</rss>
