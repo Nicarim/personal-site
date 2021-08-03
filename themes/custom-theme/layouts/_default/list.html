@@ -2,13 +2,15 @@
     <div class="content">
         {{.Content}}
     </div>
-    <h2 class="title is-2">Posts</h2>
-    <ul>
-    <!-- Ranges through content/posts/*.md -->
-    {{ range .Pages }}
-        <li>
-            <a href="{{.Permalink}}">{{.Date.Format "2006-01-02"}} | {{.Title}}</a>
-        </li>
+    {{ if gt (len .Pages) 0}}
+        <h2 class="title is-2">{{.Title}}</h2>
+        <ul>
+        <!-- Ranges through content/posts/*.md -->
+        {{ range .Pages }}
+            <li>
+                <a href="{{.Permalink}}">{{.Date.Format "2006-01-02"}} | {{.Title}}</a>
+            </li>
+        {{ end }}
     {{ end }}
     </ul>
 {{ end }}
