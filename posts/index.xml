@@ -6,15 +6,15 @@
     <description>Recent content in Blog on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 02 Aug 2021 14:19:32 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 06 Jan 2020 10:00:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>First Post</title>
-      <link>https://flicksfix.com/posts/first-post/</link>
-      <pubDate>Mon, 02 Aug 2021 14:19:32 +0200</pubDate>
+      <title>Docker swarm cluster on single laptop home lab running Proxmox VE</title>
+      <link>https://flicksfix.com/posts/docker-swarm-cluster/</link>
+      <pubDate>Mon, 06 Jan 2020 10:00:00 +0200</pubDate>
       
-      <guid>https://flicksfix.com/posts/first-post/</guid>
-      <description>How you doing
-This is first entry in here, testing how it works.</description>
+      <guid>https://flicksfix.com/posts/docker-swarm-cluster/</guid>
+      <description>This is my first blog post about running anything related to home lab. As I have already done some work before to have Proxmox VE running with connection to the router — I will be explaining that in later posts if I find time or motivation to do so.
+Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes.</description>
     </item>
     
   </channel>
