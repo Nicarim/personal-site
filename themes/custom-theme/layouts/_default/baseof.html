@@ -32,8 +32,9 @@
   </head>
 
   <body >
-
-    {{ block "header" . }}{{ partial "header.html" .}}{{ end }}
+    <div class="is-hidden-print">
+      {{ block "header" . }}{{ partial "header.html" .}}{{ end }}
+    </div>
     <main role="main" class="container is-widescreen">
       {{ block "main" . }}{{ end }}
     </main>

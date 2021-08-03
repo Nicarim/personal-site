@@ -2,7 +2,7 @@
 title: About Me
 weight: 1
 ---
-
+{{< print >}}
 # About Me
 
 I'm Marcin Gordziejewski, Software Engineer, DevOps, SRE. Based in Warsaw, Poland. 
