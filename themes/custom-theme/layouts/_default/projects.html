@@ -1,0 +1,29 @@
+{{ define "main" }}
+    <div class="content has-text-justified">
+        {{.Content}}
+    </div>
+    <div class="columns is-multiline">
+            {{ range .Pages }}
+                {{ $href := .Permalink}}
+                {{ $isExternal := false}}
+                {{if (isset .Params "externalurl")}}
+                    {{ $href = .Params.externalUrl }}
+                    {{ $isExternal = true }}
+                {{ end }}
+            <a href="{{ $href }}" class="column is-one-quarter" {{if $isExternal}} target="_blank" {{end}}>
+                <div class="title mb-2 is-4">
+                    {{.Title}}
+                    {{if (isset .Params "language") }}
+                        {{ $allLangs := split .Params.language "," }}
+                        {{ range $allLangs}}
+                            {{ $path := printf "langs/%s.html" .}}
+                            <div class="is-pulled-right">{{ partial $path . }}</div>
+                        {{end}}
+                    {{end}}
+                </div>
+
+                <div class="content mt-2">{{.Content}}</div>
+            </a>
+            {{end}}
+    </div>
+{{ end }}

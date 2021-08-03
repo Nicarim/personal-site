@@ -1,3 +1,1 @@
-{{ define "main" }}
-        <h3 class="title is-4 mt-4">Latest Posts</h3>
-{{ end }}
+{{ with .GetPage "/about" }}{{.Render}}{{end}}
