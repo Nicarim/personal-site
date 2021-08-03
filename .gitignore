@@ -74,24 +74,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 
-# Build and Release Folders
-bin/
-bin-debug/
-bin-release/
-[Oo]bj/ # FlashDevelop obj
-[Bb]in/ # FlashDevelop bin
-resources/_gen
-
-# Other files and folders
-.settings/
-
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
-
-# Hugo
-public/
-
 tmp/
