@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Hash Sum Mismatch – trouble when using WSL2 and VirtualBox | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="When I was writing a tutorial regarding usage of VirtualBox to compile Marlin firmware (for 3D Printers) I came across following issue:
+E: Failed to fetch store:/var/lib/apt/lists/partial/jp.archive.ubuntu.com_ubuntu_dists_focal_main_binary-amd64_Packages.xz Hash Sum mismatch Hashes of expected file: - Filesize:5826751 [weak] - SHA256:af226b4496cbb524bd4814d102047ae77769836203274dffc91cb543d5da13cc - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak] - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak] Hashes of received file: - SHA256:e2c7fc5a2d86f75f03612fec614dcf84d3d502976558fbe40928c1dd120bb05e - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak] - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak] - Filesize:5826751 [weak] Last modification reported: Thu, 23 Apr 2020 16:40:26 &#43;0000 Release file created at: Thu, 23 Apr 2020 17:33:17 &#43;0000 This error was really strange because SHA256 is the only one that differs.">
+    <meta name="generator" content="Hugo 0.86.0" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.4e92e93065523f4f8559b3a8a36acc209b2d4afb92474b5a142eb50a151726d8.css">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+  </head>
+
+  <body >
+
+    <h2 class="title is-2 block has-text-centered"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    <main role="main" class="container is-widescreen">
+      
+<section id="main">
+  <h1 class="title is-2">Hash Sum Mismatch – trouble when using WSL2 and VirtualBox</h1>
+  <div>
+        <article class="content">
+           <p>When I was writing a tutorial regarding usage of VirtualBox to compile Marlin firmware (for 3D Printers) I came across following issue:</p>
+<pre><code>E: Failed to fetch store:/var/lib/apt/lists/partial/jp.archive.ubuntu.com_ubuntu_dists_focal_main_binary-amd64_Packages.xz  Hash Sum mismatch
+   Hashes of expected file:
+    - Filesize:5826751 [weak]
+    - SHA256:af226b4496cbb524bd4814d102047ae77769836203274dffc91cb543d5da13cc
+    - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak]
+    - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak]
+   Hashes of received file:
+    - SHA256:e2c7fc5a2d86f75f03612fec614dcf84d3d502976558fbe40928c1dd120bb05e
+    - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak]
+    - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak]
+    - Filesize:5826751 [weak]
+   Last modification reported: Thu, 23 Apr 2020 16:40:26 +0000
+   Release file created at: Thu, 23 Apr 2020 17:33:17 +0000
+</code></pre><p>This error was really strange because SHA256 is the only one that differs.
+(<a href="https://askubuntu.com/questions/1235914/hash-sum-mismatch-error-due-to-identical-sha1-and-md5-but-different-sha256/1241893#1241893">See related post on AskUbuntu</a>)</p>
+<h2 id="solution">Solution</h2>
+<p>For me the solution that I quickly discovered due to some Japanese posting similar issue (<a href="https://ktkr3d.github.io/2020/05/07/APT-Hash-sum-mismatch-error/">https://ktkr3d.github.io/2020/05/07/APT-Hash-sum-mismatch-error/</a>).
+What gave me an idea was that I recently enabled WSL2 and so-called “Virtual Machine Platform” (that gave a strange turtle icon in virtualbox where virtualization support is shown).
+Disabling WSL2 and Virtual Machine Platform solved the issue completely.</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
