@@ -5,16 +5,19 @@
     <loc>https://flicksfix.com/about/</loc>
   </url><url>
     <loc>https://flicksfix.com/posts/</loc>
-    <lastmod>2020-05-20T10:00:00+02:00</lastmod>
+    <lastmod>2020-11-14T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://flicksfix.com/projects/</loc>
   </url><url>
     <loc>https://flicksfix.com/contact/</loc>
   </url><url>
-    <loc>https://flicksfix.com/posts/hash-sum-mismatch-virtualbox/</loc>
-    <lastmod>2020-05-20T10:00:00+02:00</lastmod>
+    <loc>https://flicksfix.com/posts/esp32-pwm-driver-prototype/</loc>
+    <lastmod>2020-11-14T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://flicksfix.com/</loc>
+    <lastmod>2020-11-14T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://flicksfix.com/posts/hash-sum-mismatch-virtualbox/</loc>
     <lastmod>2020-05-20T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://flicksfix.com/posts/docker-swarm-cluster/</loc>

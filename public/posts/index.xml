@@ -6,7 +6,18 @@
     <description>Recent content in Blog on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 May 2020 10:00:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 14 Nov 2020 10:00:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Prototyping ESP32 PWM LED Controller for Home Assistant</title>
+      <link>https://flicksfix.com/posts/esp32-pwm-driver-prototype/</link>
+      <pubDate>Sat, 14 Nov 2020 10:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/esp32-pwm-driver-prototype/</guid>
+      <description>After spending a couple of days laying in my bed with absolute no motivation at all to do anything I&amp;rsquo;ve decided to do anything that will bring me from the lair of despair.
+COVID situation here in Poland at the moment of writing the post is not really great, there is absolutely nothing to do outside because everything is cancelled.
+I can either tinker in my &amp;ldquo;electronic workshop&amp;rdquo; or do programming which I couldn&amp;rsquo;t really keep motivation for.</description>
+    </item>
+    
     <item>
       <title>Hash Sum Mismatch – trouble when using WSL2 and VirtualBox</title>
       <link>https://flicksfix.com/posts/hash-sum-mismatch-virtualbox/</link>
