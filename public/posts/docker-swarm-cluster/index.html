@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Docker swarm cluster on single laptop home lab running Proxmox VE | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="This is my first blog post about running anything related to home lab. As I have already done some work before to have Proxmox VE running with connection to the router — I will be explaining that in later posts if I find time or motivation to do so.
+Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes.">
+    <meta name="generator" content="Hugo 0.86.0" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.4e92e93065523f4f8559b3a8a36acc209b2d4afb92474b5a142eb50a151726d8.css">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+  </head>
+
+  <body >
+
+    <h2 class="title is-2 block has-text-centered"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    <main role="main" class="container is-widescreen">
+      
+<section id="main">
+  <h1 class="title is-2">Docker swarm cluster on single laptop home lab running Proxmox VE</h1>
+  <div>
+        <article class="content">
+           <p>This is my first blog post about running anything related to home lab.
+As I have already done some work before to have Proxmox VE running with connection to the router —
+I will be explaining that in later posts if I find time or motivation to do so.</p>
+<h2 id="planned"><strong>Planned</strong>:</h2>
+<ul>
+<li>I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as <em>Swarm Nodes.</em></li>
+<li>I will be using Ansible past the point when I have a fresh Ubuntu installed (installation will be manual, as this is really complicated to automate for the beginner)</li>
+<li>I will connect <em>swarm nodes</em> with docker swarm</li>
+</ul>
+<p><strong>In the future:</strong></p>
+<ul>
+<li>I want to have one more VM node that I’ll be running database in (why not on cluster? generally I find it PITA when doing trying to bootstrap things and have them running correctly so I would like to keep with stateless apps in containers first).</li>
+<li>I will deploy database (will be deciding on postgres/mysql?) on database node.</li>
+<li>I will deploy an interesting app that I found and might be useful to me — <a href="https://github.com/the-paperless-project/paperless">paperless</a>.</li>
+</ul>
+<figure><img src="/docker-swarm-cluster/laptop-server-router.jpeg"/><figcaption>
+            <h4>My homelab setup — Lenovo 500S-13ISK-80Q2 running with Intel I5–6700U, 8GB of RAM, dual boot with windows and proxmox based on debian. Connected to OpenWRT based router. In the background BananaPI M1 not connected at all.</h4>
+        </figcaption>
+</figure>
+
+<h2 id="intention-of-the-post"><strong>Intention of the post</strong></h2>
+<p>I want to document everything that I was doing with it — not just for sake of doing it — but also to interest anyone out there that wants to try it out to see how easy/hard/interesting can that be. So I will be including the simplest things here that I had in mind when choosing to do one way and not the other.</p>
+<h1 id="creating-nodes-on-proxmox">Creating nodes on Proxmox</h1>
+<p>Plan is to have 3 nodes, with 2 GB of RAM each and 1 CPU core have them run docker swarm cluster. Why not k8s or k3s or Nomad? Simplicity. I got really overwhelmed with amount of stuff you have to grasp to get them all running, and deploy anything on then that I decided to go with the simplest tool I know and expand out of that. This way I can find out how and why swarm might be limiting me. Or it wouldn’t at all for my use case?</p>
+<h2 id="operating-system">Operating system</h2>
+<figure><img src="/docker-swarm-cluster/master-lena-node.png"/><figcaption>
+            <h4>To upload an image, I simply choose the local storage on that server which I got by default when installing Proxmox, and upload it via the button.</h4>
+        </figcaption>
+</figure>
+
+<p>I choose to go with <a href="https://ubuntu.com/download/server">Ubuntu Server 19.10</a>. Why precisely Ubuntu? I’m familiar with it as it was my main go-to OS when setting up cloud servers at work. Also I lack few things in Debian (like missing sudo). I download image on to my computer, and then upload it to Proxmox via its web interface.</p>
+<p>Proxmox by default doesn’t ship with any image at all for virtual machines, so to have anything running you first need to have any image uploaded to its store.</p>
+<h2 id="creating-nodes">Creating nodes</h2>
+<p>On the right hand corner of the interface, there are two buttons for creating an instance on Proxmox.</p>
+<p>You can either create VM or a CT (Container using LXC). I know that CTs might be easier on the system, but to have docker running inside a CT <a href="https://forum.proxmox.com/threads/docker-in-lxc-container.45204/">you have to go through additional setup</a> on the host and I wanted to keep Proxmox supervisor as vanilla as it can be in case I migrate it to a better hardware.</p>
+<figure><img src="/docker-swarm-cluster/create-virtual-machine.png"/>
+</figure>
+
+<p>So I choose to create virtual machine. First step is to assign it a name and ID. While ID I will leave to whatever PVE chooses me, the name I want to set something fancy (not some <em>first-try-node-why-lol-it-sucks</em>). For that I will resort to give it a naming schema.</p>
+<p><code>pvevm-&lt;random_generated_name&gt;-node</code></p>
+<p>Where <em>pvevm</em> will stand for <strong>P</strong>roxmox<strong>VE</strong> (this way I will know where this machine even comes from when going through DHCP list on my router), for random generated name I will just use <a href="https://www.fantasynamegenerators.com/evil_names.php">villain names</a></p>
+<p>So the chosen names are:</p>
+<ul>
+<li><code>pvevm-coltontrevil-node</code></li>
+<li><code>pvevm-mordenwinter-node</code></li>
+<li><code>pvevm-eukithorblackwood-node</code></li>
+</ul>
+<p>Why so much hassle with the name? Because it will be also used as a hostname for that machine and it will be a lot easier to refer to them via DNS</p>
+<p>My router is setup to redirect requests with hostnames to their IP so <em>pvevm-coltontrevil-node.lan</em> will directly translate to its current IP. This way I don’t have to assign static IPs and collide with anything on the network I currently have. Also worth to note here that all nodes that I create are bridged to my current network so they’re visible on the same level as their hypervisor and using same DHCP/DNS server.</p>
+<p>Enough about the name, lets move forward.</p>
+<figure><img src="/docker-swarm-cluster/final-result.png"/><figcaption>
+            <h4>Final result for one of the nodes.</h4>
+        </figcaption>
+</figure>
+
+<p>In next tabs I select OS image, one we just uploaded, size of hard disk, which will be for now only 10 GB for each because whole host runs only on 50 GB (an extra challenge lets say). I assign it one core, 2048 MB of RAM, connect it to vmbr0 which is the bridge I mentioned. Rest of the settings I left on default.</p>
+<h2 id="getting-nodes-running">Getting nodes running</h2>
+<p>After creating the nodes, I will just spin them up all at once and connect via VNC to them.
+Proxmox has noVNC built in that let’s you use VNC in the browser so it will be an easy experience.
+Only drawback is that you cannot copy and paste to that VNC.</p>
+<figure><img src="/docker-swarm-cluster/three-nodes-running.png"/><figcaption>
+            <h4>Three nodes up and running with pending installation</h4>
+        </figcaption>
+</figure>
+
+<p>While installing I got the notification that there is newer version of the installer — I choose to go with the flow and use the newer one as it proposes.</p>
+<figure><img src="/docker-swarm-cluster/filesystem-setup.png"/><figcaption>
+            <h4>Outcome is the same for all machines — 1 MB for grub, rest for OS.</h4>
+        </figcaption>
+</figure>
+
+<p>Standard installation continues — Layout and locale choosing, network interface set up, http proxy, mirror URL, and partitioning.
+For partitioning I will just use entire disk that was assigned and use automated installation on that disk.</p>
+<p>Now to the tricky part that requires more than one second of a thought.
+I have to specify my name and username.
+For that I’ll just go with my name abbreviation firstname + first letter of last name.
+There is also <strong>your server’s name</strong> which I would like to be the same as the one we assigned it in PVE.
+Happily I can see the host name at the top of the window, so I just rewrite it for each of the server.</p>
+<p>Password can be set to anything, as in next step we will be able to disable login on SSH using it.</p>
+<figure><img src="/docker-swarm-cluster/openssh-monit.png"/>
+</figure>
+
+<p>Next monit is about Openssh server — we do want to explicitly enable it — this way after installation we will be in control of it using our desktop tool (terminal, ansible) instead of using VNC.</p>
+<p>Also, it seems that you’re able to set up a public key right from this interface by importing it from remote location — that really makes our life easier here.</p>
+<p>I will use GitHub source for that, simply adding the ssh key to the profile, or reuse the existing one — and type in your profile name into the field.</p>
+<p>Next step asks for installing any of the popular applications — I don’t want to use it since I will be using Ansible in next steps to automate the set-up.</p>
+<figure><img src="/docker-swarm-cluster/failed-cdrom.png"/><figcaption>
+            <h4>Such a simple thing I’m doing and already some errors</h4>
+        </figcaption>
+</figure>
+
+<p>After going through the last step I’m just waiting for installation to complete. For the SSD that I use in that laptop it took me 2 more minutes, after that I’m prompted to reboot the server. Sadly on PVE it fails to unmount the /cdroom after attempting to reboot, so I have to hit the enter again. You can safely ignore these warnings as PVE is set up to use HDD first so the reboot will be right into our freshly installed Ubuntu server.</p>
+<figure><img src="/docker-swarm-cluster/ready-cloudinit.png"/><figcaption>
+            <h4>Ready after approx. 42 seconds each.</h4>
+        </figcaption>
+</figure>
+
+<h2 id="checking-if-everything-went-smooth">Checking if everything went smooth.</h2>
+<p>For a simple check up I will try to log in using the SSH key which was imported from my GitHub.</p>
+<figure><img src="/docker-swarm-cluster/success-ssh.png"/><figcaption>
+            <h4>Log in working out of the box using hostname and login set up in the installation</h4>
+        </figcaption>
+</figure>
+
+<h1 id="automation-with-ansible">Automation with Ansible</h1>
+<p>Since we’re setting up a cluster — that means we have to operate on more than one server. Because of it — automation tool is really needed to get anything working since it will take just too much time to do it manually. Thankfully there are simple solutions that you can use to also achieve the automation and that is <strong>&gt;ANSIBLE&lt;</strong> which is really powerful yet simple tool to setup things at many places at once.</p>
+<h2 id="ansible-pre-requirements">Ansible pre-requirements</h2>
+<p>To even talk about using Ansible we will be needing it installed on our own computer. Ansible is based on python — and due to that we will be using Python tooling. I specifically use to get it running is:</p>
+<ul>
+<li><a href="https://github.com/pypa/pipenv">pipenv</a> a really painless experience with Python and installing packages.</li>
+<li>VS Code, since there is no real need to get anything better for scripting VS Code is more than enough.</li>
+<li><a href="https://docs.ansible.com/ansible/latest/community/other_tools_and_programs.html#visual-studio-code">For best experience install these plugins into your VS Code</a>, taken officially from Ansible page.</li>
+</ul>
+<p>And that’s really it.</p>
+<p>After you have <code>pipenv</code> installed, to initiate the project use <code>pipenv --three</code> so you’re using the correct python. If you don’t have python 3 installed — just use your own distribution’s package for <code>python3</code><em>.</em></p>
+<p>Then the only command we need to run is <code>pipenv install ansible</code> — that will get us the newest Ansible installed right into our project. At the time of writing it was 2.9.2, you can also use this specific version by running <code>pipenv install ansible==2.9.2</code> instead.</p>
+<h2 id="setting-up-ansible-to-operate-our-cluster">Setting up Ansible to operate our cluster</h2>
+<p>The project structure that I use is as follows</p>
+<p><code>ansible.cfg</code> in root folder:</p>
+<pre><code>[defaults]  
+inventory = ./inventory.yaml  
+host_key_checking = False  
+roles_path = ./galaxy-roles/:./roles/
+
+[ssh_connection]   
+ssh_args = -o ForwardAgent=yes -o ControlMaster=auto -o ControlPersist=60s
+</code></pre><ul>
+<li><code>inventory</code> path tells Ansible where to look for for list of our machines</li>
+<li><code>roles_path</code> path where Ansible should look for roles (<a href="https://docs.ansible.com/ansible/2.9/user_guide/playbooks_reuse_roles.html">see here as to what are roles</a>). This will be explained later on.</li>
+<li>disabled <code>host_key_checking</code> suppresses messages for accepting server fingerprints — just a convenience given we work on known servers.’</li>
+<li><code>[ssh_connection]</code> part sets up agent forwarding which <em>tl;dr</em> lets use your private keys when making ssh connections on the target (for example pulling git repositories on your behalf instead of letting every server to access your repositories). They’re really just <code>ssh</code> command arguments.</li>
+</ul>
+<p><code>inventory.yaml</code></p>
+<pre><code>pvevm-nodes:  
+  hosts:  
+    pvevm-coltontrevil-node.lan:  
+      ansible_user: marcing  
+      ansible_python_interpreter: python3  
+    pvevm-mordenwinter-node.lan:  
+      ansible_user: marcing  
+      ansible_python_interpreter: python3  
+    pvevm-eukithorblackwood-node.lan:  
+      ansible_user: marcing  
+      ansible_python_interpreter: python3
+</code></pre><p>Nothing really fancy here — we create a group called <code>pvevm-nodes</code> (remember when I said these names matter?),
+give that group <em>list of hosts</em> where <em>key is the host address</em>, and <em>for each host</em>
+I’m telling it to use specific user to log in (by default it would be name of my local user),
+and to use <code>python3</code> explicitly on the server (this is what Ansible uses to manage the server).
+The interpreter is here explicitly set because we want to be sure we will be using python 3 and not python 2 which might be later in the future thrown out of the system.</p>
+<p>And that’s it — we’re ready to operate our cluster using Ansible.</p>
+<p>To test it out we can call Ansible ping module on all the nodes.</p>
+<p><strong>Important remark</strong>: Whenever you want to work in the project — remember to run <code>pipenv shell</code> first this way Ansible will be visible in our terminal (you have to do it each time you want to work in a new terminal window).</p>
+<figure><img src="/docker-swarm-cluster/ansible-test.png"/>
+</figure>
+
+<p>Running <code>ansible -m ping pvevm-nodes</code> we should see above result in our terminal — this means Ansible is able to correctly connect to all the hosts in the group.</p>
+<h1 id="installing-docker-using-ansible">Installing docker using Ansible</h1>
+<p>We don’t have to write all of our playbooks (scripts composed of roles) by ourselves —
+Ansible has a huge community at <a href="https://galaxy.ansible.com">galaxy</a> where you can find many roles which will speed up your project.
+Installing docker is no tricky job so we can use a great <a href="https://galaxy.ansible.com/geerlingguy/docker">docker role created by geerlingguy</a>
+(I generally recommend all of his roles to get job done).</p>
+<p>We’ve set up our <code>roles_path</code> with <code>./galaxy-roles/</code> as the first folder —
+this is where roles that we install through <code>ansible-galaxy</code> will be stored and read from.</p>
+<p>To install the role:</p>
+<pre><code>$ ansible-galaxy install geerlingguy.docker
+- downloading role 'docker', owned by geerlingguy  
+- downloading role from [https://github.com/geerlingguy/ansible-role-docker/archive/2.6.0.tar.gz](https://github.com/geerlingguy/ansible-role-docker/archive/2.6.0.tar.gz)  
+- extracting geerlingguy.docker to /home/gordonryzen/Projects/homelab-project/ansible-playbooks/roles/geerlingguy.docker  
+- geerlingguy.docker (2.6.0) was installed successfully
+</code></pre><p>If everything went well, you should see that role appear in galaxy-roles directory.
+Now we need to check up its README to see how to use it (it’s visible both on galaxy site and in the folder that was just created).
+I’ll leave it up to you to study.</p>
+<h2 id="creating-first-playbook">Creating first playbook</h2>
+<p>Playbook consists of a several things:</p>
+<ul>
+<li>What it should target — host or group of hosts</li>
+<li>roles and their variables (treat variables as function arguments if you’re a programmer, and role as a function to execute on the server)</li>
+<li>tasks (which are specific to this playbook — list of actions to be performed on the server, role is also one of these lists)</li>
+</ul>
+<p>And generally this should be enough for us to get the first playbook running.</p>
+<pre><code>---  
+- hosts: pvevm-nodes  
+  become: yes  
+  roles:  
+    - role: geerlingguy.docker  
+      vars:  
+        docker_users:  
+          - marcing
+</code></pre><p>This should be pretty self-explanatory — this playbook consists of a one role, where we pass <code>docker_users</code> variable,
+and a list of users which should be added to the group of users that can interact with docker
+(see <a href="https://docs.docker.com/install/linux/linux-postinstall/">official docker post installation steps</a> as this is mapping of the guide).
+There is also mysterious <code>become: yes</code> which basically means that the playbook should be ran as a super user, using default <em>become</em> method (by default sudo).</p>
+<p>I saved this playbook as <code>playbooks/pvevm-nodes.yaml</code> and ran this:</p>
+<pre><code>$ ansible-playbook playbooks/pvevm-nodes.yaml  
+  
+PLAY [pvevm-nodes] *************************************************************************************
+TASK [Gathering Facts] *********************************************************************************  
+fatal: [pvevm-eukithorblackwood-node]: FAILED! =&gt; {&quot;msg&quot;: &quot;Missing sudo password&quot;}  
+fatal: [pvevm-mordenwinter-node]: FAILED! =&gt; {&quot;msg&quot;: &quot;Missing sudo password&quot;}  
+fatal: [pvevm-coltontrevil-node]: FAILED! =&gt; {&quot;msg&quot;: &quot;Missing sudo password&quot;}
+</code></pre><p>And we approach <strong>first issue</strong> — it seems we cannot use sudo without providing password by default.
+There are two ways to solve this — one is to use <code>-K</code> when calling playbook — this way we can provide password,
+or create a role which removes the need for using password when using sudo.
+I will go with creating a role since that is always a way to learn something new.</p>
+<h2 id="creating-a-role-for-our-playbook">Creating a role for our playbook</h2>
+<p>We will call this role <code>passwordless-sudo</code> as this will ensure we can use sudo without a password.
+Create a structure like this in your <code>roles</code> directory:</p>
+<pre><code>└── roles  
+    └── passwordless-sudo  
+        └── tasks  
+            └── main.yaml
+</code></pre><p>Content for <code>main.yaml</code>will be as follows:</p>
+<pre><code>---  
+- name: Ensure sudo can be ran without password  
+  lineinfile:  
+    path: /etc/sudoers  
+    regexp: &quot;^{{user}} &quot;  
+    line: &quot;{{user}} ALL=(ALL) NOPASSWD:ALL&quot;  
+    backup: yes
+</code></pre><p>To explain what happened here, have <a href="https://docs.ansible.com/ansible/latest/modules/lineinfile_module.html">documentation for lineinfile</a> open side by side:</p>
+<ul>
+<li><code>backup: yes</code> backs up our file in case anything goes wrong</li>
+<li><code>path: /etc/sudoers</code> is the file we have to edit to make passwordless sudo possible.</li>
+<li><code>line: “{{user}} ALL=(ALL) NOPASSWD:ALL&quot;</code> is using our invented variable <code>user</code> which we will provide in playbook
+to specify which user we mean to make passwordless sudo (generally this will allow us to use this role for any user ever).</li>
+<li><code>regexp: “^{{user}} “</code> lineinfile works in a way that it uses regex to find a first matching line,
+and checks whether its content is what we provided in <code>line</code> — if that is not the case — it will edit that line to match it.
+If there is no such line — it will add it by the end. This way subsequent runs of this action will not add any more lines to that file,<br>
+and if someone edits it changing for example from <code>ALL=(ALL)</code> to something else — it will get updated back to this value.
+This ensures our playbooks are idempotent.</li>
+</ul>
+<p>Now we can go back to our playbook, and put the following code in it:</p>
+<pre><code>---  
+- hosts: pvevm-nodes  
+  become: yes  
+  roles:  
+    - role: passwordless-sudo  
+      vars:  
+        user: marcing
+</code></pre><p>I will just run <em>passwordless-sudo</em> role to see if it works correctly,
+and then add back the docker role we had there. Let’s run our playbook,
+this time with <code>-K</code> since we have no other way (other than providing the password in inventory) to make it run.</p>
+<pre><code>$ ansible-playbook playbooks/pvevm-nodes.yaml -K  
+BECOME password: PLAY [pvevm-nodes] ***************
+
+TASK [Gathering Facts] **********************  
+ok: [pvevm-eukithorblackwood-node]  
+ok: [pvevm-coltontrevil-node]  
+ok: [pvevm-mordenwinter-node]
+
+TASK [passwordless-sudo : Ensure sudo can be ran without password] *************************************  
+changed: [pvevm-coltontrevil-node]  
+changed: [pvevm-mordenwinter-node]  
+changed: [pvevm-eukithorblackwood-node]
+
+PLAY RECAP *********************  
+pvevm-coltontrevil-node    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0     
+pvevm-eukithorblackwood-node : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0     
+pvevm-mordenwinter-node    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+</code></pre><p>We see that running it made a change on all 3 hosts to add the line to the file.
+Now if we were to run the same role again — the same task would tell us “ok”
+instead of “changed” — that means no change was necessary since server is already configured.</p>
+<p>We will add back the docker role and run it again, role will look like so:</p>
+<pre><code>---  
+- hosts: pvevm-nodes  
+  become: yes  
+  roles:  
+    - role: passwordless-sudo  
+      vars:  
+        user: marcing  
+    - role: geerlingguy.docker  
+      vars:  
+        docker_users:  
+          - marcing
+</code></pre><p>And the command is again the same, but without <code>-K</code> now:</p>
+<pre><code>$ ansible-playbook playbooks/pvevm-nodes.yaml
+&lt;I will cut the data to not make this too big&gt;
+TASK [passwordless-sudo : Ensure sudo can be ran without password] *************************************  
+ok: [pvevm-eukithorblackwood-node]  
+ok: [pvevm-coltontrevil-node]  
+ok: [pvevm-mordenwinter-node]
+[......]
+TASK [geerlingguy.docker : Add Docker repository.] *****************************************************  
+fatal: [pvevm-mordenwinter-node]: FAILED! =&gt; {&quot;changed&quot;: false, &quot;msg&quot;: &quot;apt cache update failed&quot;}  
+fatal: [pvevm-coltontrevil-node]: FAILED! =&gt; {&quot;changed&quot;: false, &quot;msg&quot;: &quot;apt cache update failed&quot;}  
+fatal: [pvevm-eukithorblackwood-node]: FAILED! =&gt; {&quot;changed&quot;: false, &quot;msg&quot;: &quot;apt cache update failed&quot;}
+</code></pre><p>Another issue occurred, this time we just get some error which tells us nothing,
+but we can rerun the playbook with <code>-vvv</code> to get more output to narrow down the problem
+(<strong>be warned:</strong> this will throw lots of data on the screen)</p>
+<pre><code>[....]
+&quot;invocation&quot;: {  
+        &quot;module_args&quot;: {  
+            &quot;codename&quot;: null,  
+            &quot;filename&quot;: null,  
+            &quot;install_python_apt&quot;: true,  
+            &quot;mode&quot;: null,  
+            &quot;repo&quot;: &quot;deb [arch=amd64] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) eoan stable&quot;,  
+[....]
+</code></pre><p>Looks like it errors on adding docker apt repository, <a href="https://github.com/docker/for-linux/issues/833">quick google</a>
+tells that this is a common issue because we choose to go with newest available Ubuntu (19.10) which is not yet supported.
+Another link provided in <a href="https://stackoverflow.com/questions/45023363/what-is-docker-io-in-relation-to-docker-ce-and-docker-ee/57678382#57678382">github says docker.io should be used instead</a>.
+And I said I wanted to go easy route huh?</p>
+<p>The simplest solution here is to just force our role to use disco (19.04) packages instead for docker, and that’s what we’re going to do.</p>
+<p>We can see in <code>galaxy-roles/geerlingguy.docker/defaults/main.yml</code> that the apt path is provided as follows:</p>
+<pre><code>docker_apt_repository: &quot;deb [arch={{ docker_apt_arch }}] [https://download.docker.com/linux/{{](https://download.docker.com/linux/{{) ansible_distribution|lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}&quot;
+</code></pre><p>We can just replace <code>ansible_distribution_release</code> for this role to be something else,
+for that we can just provide another var for a role where we set this to <code>disco</code> .</p>
+<pre><code>---  
+- hosts: pvevm-nodes  
+  become: yes  
+  roles:  
+    - role: passwordless-sudo  
+      vars:  
+        user: marcing  
+    - role: geerlingguy.docker  
+      vars:  
+        ansible_distribution_release: &quot;disco&quot;  
+        docker_users:  
+          - marcing
+</code></pre><p>Running this again makes it look like we solved the issue and installation continued. By the end we should get information similar to this:</p>
+<pre><code>PLAY RECAP *********************************************************************************************  
+pvevm-coltontrevil-node    : ok=15   changed=5    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0     
+pvevm-eukithorblackwood-node : ok=15   changed=5    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0     
+pvevm-mordenwinter-node    : ok=15   changed=5    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0
+</code></pre><p>No failed tasks mean it worked correctly. To see if docker works correctly we can call on each host a hello world command:</p>
+<pre><code>$ ansible pvevm-nodes -a &quot;docker run hello-world&quot;
+
+pvevm-coltontrevil-node | CHANGED | rc=0 &gt;&gt;Hello from Docker!  
+...
+pvevm-mordenwinter-node | CHANGED | rc=0 &gt;&gt;Hello from Docker!  
+...
+pvevm-eukithorblackwood-node | CHANGED | rc=0 &gt;&gt;Hello from Docker!  
+...
+</code></pre><p>It means that every one of our servers can happily run hello-world container and docker functionality is more or less working correctly on them.</p>
+<h1 id="creating-docker-swarm">Creating docker swarm</h1>
+<p>For that we could use a galaxy role, <a href="https://github.com/atosatto/ansible-dockerswarm">but the only sufficiently good enough I found was also trying to install docker again</a>
+which sounds too complicated and might conflict with role we just used.</p>
+<p>So instead we will follow the <a href="https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/">tutorial of docker on swarm</a>
+and recreate the steps in Ansible roles.</p>
+<p>To create a swarm cluster, we need to define manager and workers,
+for that we will need to modify our inventory a little to distinguish between manager and workers.
+We need to append to <code>pvevm-nodes</code> following code, just after the hosts on second level:</p>
+<pre><code> children:  
+    pvevm-nodes-workers:  
+      hosts:  
+        pvevm-coltontrevil-node.lan:  
+        pvevm-mordenwinter-node.lan:  
+    pvevm-nodes-manager:  
+      hosts:  
+        pvevm-eukithorblackwood-node.lan:
+</code></pre><p>This will make colton and morden workers, and eukithor manager.</p>
+<h2 id="swarm-role">Swarm role</h2>
+<p>Role will base on ability to <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_delegation.html#delegation">delegate specific actions to</a> another server.
+We will be doing following schema</p>
+<ul>
+<li>Create a leader on leader nodes (customizable as to what are leader nodes through variable)</li>
+<li>Copy leader token</li>
+<li>Join worker nodes using leader token</li>
+<li>We don’t want to run this if there already is a leader (extra points for running this only for servers which didn’t join yet)</li>
+<li>We will verify manually if cluster was correctly created (extra points for doing it at the end of the whole role)</li>
+</ul>
+<pre><code>roles  
+    ├── docker-swarm  
+        └── tasks  
+            ├── main.yaml  
+            ├── manager-tasks.yaml  
+            └── worker-tasks.yaml
+</code></pre><p>Following structure of the task is assumed, we will be going step by step to see how the role got created.</p>
+<p><em>annotation: I’ve spend almost an hour figuring out this role, so writing it down would take even more, but the final solution is what I’m somehow happy with</em></p>
+<h2 id="mainyml">main.yml</h2>
+<pre><code>---  
+- name: Run manager tasks  
+  include_tasks: manager-tasks.yaml  
+  run_once: yes  
+  loop: &quot;{{ groups[manager_nodes] }}&quot;
+- name: Run worker tasks  
+  include_tasks: worker-tasks.yaml  
+  run_once: yes  
+  loop: &quot;{{ groups[worker_nodes] }}&quot;
+</code></pre><p>This is looping through two variables that are provided externally — <code>manager_nodes</code> and <code>worker_nodes</code>.</p>
+<ul>
+<li><code>run_once: yes</code> makes a single task for a given loop iteration be ran only once for the first server.
+This is not necessary but cleans a bit the output (because later on you will see on how we used <code>delegate_to</code> to split out the actions)</li>
+<li><code>loop: {{}}</code> runs through a list which is pulled out of inventory by operator provided name.
+In our case <code>worker_nodes=pvevm-nodes-workers</code> and <code>manager_nodes=pvevm-nodes-manager</code> (2 worker nodes, one manager node, but it is a list of one element so that’s why looping anyway)</li>
+</ul>
+<h2 id="creating-a-leader">Creating a leader</h2>
+<p>Creating a leader is placed within <code>manager-tasks.yaml</code>, with the following content</p>
+<pre><code>- name: &quot;Set facts&quot;  
+  set_fact:  
+    advertise_addr: '{{ hostvars[item][&quot;ansible_default_ipv4&quot;][&quot;address&quot;] }}'
+- name: &quot;Check if leader was already elected&quot;  
+  delegate_to: &quot;{{item}}&quot;  
+  command: docker info  
+  register: docker_info
+- name: &quot;Make selected node a leader&quot;  
+  delegate_to: &quot;{{item}}&quot;  
+  delegate_facts: yes  
+  command: docker swarm init --advertise-addr {{ advertise_addr }} --listen-addr {{ advertise_addr }}  
+  when: 'docker_info.stdout is not search(&quot;Is Manager: true&quot;)'
+- name: &quot;Get worker join token&quot;  
+  delegate_to: &quot;{{item}}&quot;  
+  delegate_facts: yes  
+  command: docker swarm join-token worker -q  
+  register: worker_join_token- name: &quot;Set worker join token fact&quot;  
+  set_fact:  
+    worker_join_token: &quot;{{worker_join_token.stdout}}&quot;
+</code></pre><p>First action is to just assign an address of leader to the shorter variable name.
+This hack was needed instead of just using <code>ansible_default_ipv4</code> because when delegating,
+this variable is actually equal to machine on which behalf we delegated the task for, and not of which machine it was actually running.</p>
+<p>All <code>delegate_to</code> just tells which server it should be running on (where <code>item</code> is iterated from <code>loop</code> in <code>main.yaml</code> ).</p>
+<p>Rest of it is pretty self explanatory — we run swarm init, only when this node is not manager already,
+and we get the token using <code>-q</code> flag so we get pure token in <code>worker_join_token.stdout</code> variable instead of some noise that init outputs.
+We then assign it as a global fact to be used in second set of tasks.</p>
+<h2 id="joining-workers">Joining workers</h2>
+<p>This one is really simple <code>worker-tasks.yaml</code></p>
+<pre><code>- name: &quot;Set facts about join address&quot;  
+  set_fact:  
+    join_address: '{{hostvars[groups[manager_nodes].0][&quot;ansible_default_ipv4&quot;][&quot;address&quot;]}}'
+- name: &quot;Check if workers are already part of swarm&quot;  
+  delegate_to: &quot;{{ item }}&quot;  
+  command: docker info  
+  register: docker_info_worker
+- name: &quot;Join workers&quot;  
+  delegate_to: &quot;{{ item }}&quot;  
+  command: docker swarm join --token {{worker_join_token}} {{join_address}}  
+  when: 'docker_info_worker.stdout is not search(&quot;Swarm: active&quot;)'
+</code></pre><p>In the first step I set <code>join_address</code> as an alias to first ipv4 address of the manager_nodes.
+I know it is plural, but I use it as singular anyway here. Don’t burn me yet for this.</p>
+<p>We also again pull the info from <code>docker info</code> about the state of the node, because we cannot join it twice to same cluster,
+and if it is not joined we just call <code>docker swarm join</code></p>
+<h2 id="verifying-if-swarm-works">Verifying if swarm works</h2>
+<p>We will use an <a href="https://docs.docker.com/engine/swarm/swarm-tutorial/deploy-service/">example from docker site</a>,
+and create hello world service that will ping docker.com.</p>
+<p><strong>Warning:</strong> this command must be run on manager, not on the workers.</p>
+<pre><code>$ docker service create --replicas 1 --name helloworld2 alpine ping docker.com  
+jcs85egp6ophc0fqnwyhmqjn9  
+overall progress: 1 out of 1 tasks   
+1/1: running   [==================================================&gt;]   
+verify: Service converged
+</code></pre><p>Since I already had service of <code>helloworld</code> ran, I got now two services, lets see where they got replicated.</p>
+<figure><img src="/docker-swarm-cluster/swarm-cluster.png"/><figcaption>
+            <h4>Swarm is working — we created two services and they got balanced on the worker nodes</h4>
+        </figcaption>
+</figure>
+
+<h1 id="wrap-up">Wrap up</h1>
+<p>If you made it to the end — congratulations, because this is my first blog post and if it was any interesting to you leave me a comment to cheer me up. Writing this post itself made me actually do a lot to know what I wanted to do in the end. And it made a nice way to keep me motivated to finish it (since I wanted to have it finished not left halfway through!)</p>
+<p>While the Ansible playbook that I wrote could have been a lot better — this gives a nice overview through what you need to go through to actually have a simple swarm running from almost literally a ground up.</p>
+<figure><img src="/docker-swarm-cluster/wrap-up.png"/><figcaption>
+            <h4>Overview of what was achieved</h4>
+        </figcaption>
+</figure>
+
+<p>I might go into another post on how to have an application running on it — but until then see you soon</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    
+  </body>
+</html>
