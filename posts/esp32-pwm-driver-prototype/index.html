@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Prototyping ESP32 PWM LED Controller for Home Assistant | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="After spending a couple of days laying in my bed with absolute no motivation at all to do anything I&rsquo;ve decided to do anything that will bring me from the lair of despair.
+COVID situation here in Poland at the moment of writing the post is not really great, there is absolutely nothing to do outside because everything is cancelled.
+I can either tinker in my &ldquo;electronic workshop&rdquo; or do programming which I couldn&rsquo;t really keep motivation for.">
+    <meta name="generator" content="Hugo 0.86.0" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.4e92e93065523f4f8559b3a8a36acc209b2d4afb92474b5a142eb50a151726d8.css">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+  </head>
+
+  <body >
+
+    <h2 class="title is-2 block has-text-centered"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    <main role="main" class="container is-widescreen">
+      
+<section id="main">
+  <h1 class="title is-2">Prototyping ESP32 PWM LED Controller for Home Assistant</h1>
+  <div>
+        <article class="content">
+           <p>After spending a couple of days laying in my bed with absolute no motivation at all to do anything I&rsquo;ve decided to do anything that will bring me from the lair of despair.</p>
+<p>COVID situation here in Poland at the moment of writing the post is not really great, there is absolutely nothing to do outside because everything is cancelled.</p>
+<p>I can either tinker in my &ldquo;electronic workshop&rdquo; or do programming which I couldn&rsquo;t really keep motivation for.</p>
+<p><strong>It&rsquo;s not really only you dear reader whom might have this problem too!</strong></p>
+<p>I&rsquo;ve taken 3 weeks of free vacation to do things I&rsquo;ve always wanted to do but instead I spent half of it playing games (which I don&rsquo;t regret!)
+and half of it&hellip; doing absolutely nothing and lying in the bed.</p>
+<figure><img src="/esp32-pwm-driver-prototype/soldering-setup.jpg"/><figcaption>
+            <h4>DIY workshop that I&#39;ve assembled over time</h4>
+        </figcaption>
+</figure>
+
+<p>But enough of the depressive kind of things, and let&rsquo;s dive deep into actual stuff I&rsquo;ve done.</p>
+<h2 id="constraints">Constraints</h2>
+<p>I rent a flat.
+That means I cannot do anything that is not allowed by the landlord.
+That includes drilling and making permanent changes.
+So everything I’m doing needs to be easily reversible or fixable.</p>
+<p>Currently I’ve been using Sonoff Mini to control the lights in my room,
+because switches for them are really far away from the bed and I was always really lazy to shut them off before sleep.
+So I added smart relay to that. But this only gives me the ability to switch on or off bulbs and the lamps are really positioned badly.
+Idea came to my mind that I could use double-sided tape and LEDs strips inside LED trough.</p>
+<h2 id="hardware-choices">Hardware Choices</h2>
+<p>After having idea in my mind how and where I want to place it it was time to choose the tools.</p>
+<h3 id="led-strips">LED Strips</h3>
+<p>For LED strip I went with 1200 lumen 5050 60LED per meter.
+It claimes to be 12W per meter, and cost me around 11 PLN/meter (around $2) so I’ve bought around 7 meters of it.</p>
+<p>This strip was dual LED per cell so it had “warm” and cold LED in a single chip.
+It was wired the same way RGB strips are wired (4 wires) but one of the wires was simple not used.</p>
+<figure><img src="/esp32-pwm-driver-prototype/led-strip.jpg"/><figcaption>
+            <h4>Dual Warm/Cold LED strip</h4>
+        </figcaption>
+</figure>
+
+<p>One problem was that the “warm” light of that strip is not really warm as in orange in its maximum setting
+but more of a white + a tiny bit of green/yellow.
+On the other hand cold one was actually pretty cold. But I guess I won’t complain about such a cheap strip.</p>
+<h3 id="power-adapter">Power Adapter</h3>
+<figure><img src="/esp32-pwm-driver-prototype/power-adapter.jpg"/>
+</figure>
+
+<p>Nothing special. Because I intended to have three sectors of lights, I’ve chosen 12V / 3A in a DIY package.
+One end you add the AC cable, the other way you got 12V. And it is pretty so you can hide it somewhere invisible.
+I plan to put it inside a 3D Printed case with controller so all I do is plug the power and connect the LEDs through exposed connectors.
+But that will come soon (I might write a post about that too!). This one costed me around 25PLN each (~$7)</p>
+<h3 id="led-controller">LED Controller</h3>
+<p>My only choice for cheap DIY was to either use ESP8266 or ESP32.
+While ESP8266 is cheaper, and I don’t care about performance in that particular usage I chose to go with ESP32.
+Reason for choosing ESP32 was that it has built in dedicated PWM support.
+<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/ledc.html">See related documentation entry on espressif</a>.
+What that means is that I can set the brightness of the LED through GPIO output of my ESP32.</p>
+<figure><img src="/esp32-pwm-driver-prototype/esp32-wroom.jpeg"/><figcaption>
+            <h4>ESP32 NodeMCU v1.1 dev kit</h4>
+        </figcaption>
+</figure>
+
+<p>I could’ve done software PWM on ESP8266 but <a href="https://esphome.io/components/output/esp8266_pwm.html">documentation of ESPHome</a>
+said that it&rsquo;s preferred to use dedicated PWM hardware instead.</p>
+<p>Since I hate flickering of any sort I’ve decided to use dedicated PWM of ESP32 and set the frequency high enough that I won’t see any flicker at all.</p>
+<p>BTW I’m talking about <a href="https://www.instyleled.co.uk/what-causes-led-flicker-and-how-can-i-stop-it-happening/">this sort of flickering</a>
+you get when you buy cheap dimmable LEDs on supermarket sale or these LED bulbs mounted to normal light bulbs mount.
+That is horrible and I can’t stand it. I didn&rsquo;t even want a chance of it occurring so ESP32 it was</p>
+<h3 id="other-stuff">Other stuff</h3>
+<p>Other than that, I’ve also bought 4 core cable dedicated to soldering to these strips.
+This is a lot better than wiring it all separately since it will create unbelievable mess if you use single wires for each connection.</p>
+<p><figure><img src="/esp32-pwm-driver-prototype/four-core-wire.jpg"/><figcaption>
+            <h4>Four core wire</h4>
+        </figcaption>
+</figure>
+
+<figure><img src="/esp32-pwm-driver-prototype/led-troughs-45degree.jpg"/><figcaption>
+            <h4>led troughs 45 degree</h4>
+        </figcaption>
+</figure>
+</p>
+<h2 id="on-pwm-control">On PWM Control</h2>
+<p>For anyone who is familiar with electronics and PWM, just skip it.
+For anyone else here comes a fast explanation of what PWM means.</p>
+<p>PWM is Pulse Width Modulation, that means we use “Width” of the pulse to modulate the signal.
+Width comes from the fact that if you plug it into the Oscilloscope you will see it exactly as a width of the pulse.</p>
+<p>Imagine that you want to power your device with 50% of power.
+Assuming the device is 12V and it responds linearly to the voltage you give it, you can just power it with 6V and you will have half the power.
+But changing the voltage is a more complicated. Hence the PWM.</p>
+<p>Now imagine you run your device for 10 seconds and its all that matters.
+Easiest will be to use the light bulb. Power it on for 5 seconds, power it off for 5 seconds and you just powered it using half the power.</p>
+<p>But you might say – its not what we wanted! We didn’t want to have it off for half of the time.</p>
+<p>So instead of considering the 10 seconds, consider 1 second. power it on for half the
+second and off for another half and you got 1Hz of PWM modulation.</p>
+<p>Speed it up to 2000Hz and you won’t even notice the flickering –
+and the device will in fact use as much power as you give it using PWM.</p>
+<p>This is rather simplified explanation and there are many more things to consider other than mentioned here,
+but I’m no electronics expert, merely just a hobbyist and this is enough of explanation for me to just use PWM for what I need it to</p>
+<h2 id="failed-attempt-at-running-esp32-with-12v">Failed attempt at running ESP32 with 12V</h2>
+<p>ESP32 NodeMCU and other dev kit boards have their own <strong>Linear Voltage Regulator</strong> (<a href="http://www.advanced-monolithic.com/pdf/ds1117.pdf">AMS1117-3.3</a>) which regulates the power to selected voltage.
+Since ESP32 is 3.3V powered, when you connect it to 5V USB it uses that regulator to not burn down the chip.
+For regulating from 5V to 3.3V its not a problem for that tiny chip, given that ESP with GPIO for 2 channels consumes around 150mA.</p>
+<p>However if you plug in 12V as I first tried…. well, you basically can run it too, but it will dissipate around (12V – 3.3V) * 0.15A = 2W
+(<a href="https://www.sparkfun.com/tutorials/217">see this awesome sparkfun post for how to calculate it</a>) of power into the heat.
+And after a while it just shorted and burned one of the boards down.
+I tried to save it by replacing external diode that was not conducting anyhow (I solder-shorted it to test it out) but it seemed to burn down the ESP32 itself. Poor soul.</p>
+<p><strong>Preferred way</strong> to connect ESP32 to 12V is to either step it down using step-down converters (<a href="https://www.pololu.com/product/2122">like this one from pololu</a>)
+and connect 3.3V output directly to 3.3V input, or step it down to 5V externally and connect it to VIN of the board since 5V to 3.3V conversion is no problem for it.</p>
+<h2 id="using-esphome-for-yaml-based-programming-of-esp32">Using ESPHome for YAML based programming of ESP32</h2>
+<p><a href="https://esphome.io/guides/getting_started_command_line.html">ESPHome is awesome piece of software</a>.
+Seriously, if you haven’t heard about it go check it out.
+It basically allows you to write software for ESP using simple declarative YAML for whatever components you want to support in your code.</p>
+<p>For my use case, this YAML was enough to get it up and running in no time.</p>
+<pre><code>esphome:
+  name: curtain_led
+  platform: ESP32
+  board: nodemcu-32s
+    
+wifi:
+  ssid: &lt;WiFi name&gt; 
+  password: &lt;WiFi Password&gt;
+  
+mqtt:
+  broker: &lt;Broker IP&gt;
+  discovery: True
+
+light:
+  - platform: cwww
+    name: &quot;Curtain LED&quot;
+    cold_white: gpio_18
+    warm_white: gpio_19
+    cold_white_color_temperature: 5500K
+    warm_white_color_temperature: 3500K
+    
+
+output:
+  - platform: ledc
+    pin: GPIO18
+    id: gpio_18
+    frequency: 2000Hz
+  - platform: ledc
+    pin: GPIO19
+    id: gpio_19
+    frequency: 2000Hz
+</code></pre><p>What happened here?</p>
+<ul>
+<li>We define the meta information in <strong>esphome</strong> block. We need to tell it what board we use and what chip we use so it maps ports and compiles correctly.</li>
+<li><strong>wifi</strong> is pretty self-explanatory. We can also configure it to provide a hotspot for configuration so we don’t hardcode the password in the flash but I don’t care about it at this point.</li>
+<li><strong>mqtt</strong> is queue used for communication between devices. this is basically where home assistant sends and receives events from/to devices.</li>
+<li><strong>light</strong> is definition of our light. Defining the light here is crucial for correct Home Assistant auto-detection. <strong>cwww</strong> is simply two LED strip with cold/warm LED channels.</li>
+<li><strong>output</strong> here we define what ports do what on our board. I defined two PWM outputs and gave them an <strong>id</strong> that was used in <strong>light</strong> block.
+Frequency of PWM here defines the “flicker” of the light if we use PWM for dimming. Anything above 1000-2000Hz should be plenty so that it won’t be visible to your eye.</li>
+</ul>
+<p>And that’s it. I now just connect the board to the computer using provided USB, and run <code>esphome &lt;config_name&gt;.yaml run</code>.
+This flashes the device with specified configuration. Its really that simple</p>
+<h2 id="wiring-the-esp32-to-led-strip">Wiring the ESP32 to LED strip</h2>
+<p>Here comes the tricky part (I mean, this is easy concept, but was the hardest of everything previously mentioned).</p>
+<p>We need to wire the LED strip in a way that our GPIO turns it on/off with given PWM duty cycle.
+But we can’t send let’s say 1A of current through our GPIO directly to the LED strip because we will burn our microcontroller down.</p>
+<p>For that comes the MOSFET transistor. It allows switching it on/off fast enough, so we can use our PWM signal to switch on/off 12V for the LED strip.</p>
+<p><strong>This <a href="https://dubiouscreations.com/2020/08/16/building-an-esp32-light-controller/">blog I came across while doing it</a> has greatly helped me understand</strong> how to use MOSFET to my advantage.
+It also gave me an idea to create my own board but that will come later :)</p>
+<p>For my application, I’ve used <strong>IRL540N</strong> MOSFET transistor that I had lying around.</p>
+<p>Since I had two channels, I connected two GPIOs to two seperate MOSFETs (to control cold/warm LED independently).</p>
+<p><figure><img src="/esp32-pwm-driver-prototype/board-view-1.jpg"/><figcaption>
+            <h4>Beautiful board isn&#39;t it?</h4>
+        </figcaption>
+</figure>
+
+<figure><img src="/esp32-pwm-driver-prototype/board-view-2.jpg"/>
+</figure>
+</p>
+<p>This is really messy on the breadboard, but easy in reality:</p>
+<ul>
+<li>On the left image you can see ESP32, 3.3V buck converter, and two MOSFETs (and 2,54mm connector)</li>
+<li>Top red and black wires provide 12V and GND</li>
+<li>Two 100Ohm Resistors on the right are used to connect GPIOs to MOSFETs <strong>Gate</strong> (on the right)</li>
+<li>Same GPIOs are also connected through 20k Ohm to GND to pull it down when it is off. Since the path to MOSFET is low resistance,
+it doesn’t matter when it on running. But when its off, we don’t want any floating happening hence high resistance path to ground.</li>
+<li>MOSFETs are connected to GND on <strong>Drain</strong>, and to LEDs warm/cold channel on <strong>Source</strong>.</li>
+<li>Only thing left on that board is connection of 3.3V output of buck converter to 3.3V IN of the board.</li>
+</ul>
+<h2 id="final-result">Final result</h2>
+<p>Images speak for itself.</p>
+<p><figure><img src="/esp32-pwm-driver-prototype/final-warm.jpg"/><figcaption>
+            <h4>Warm</h4>
+        </figcaption>
+</figure>
+
+<figure><img src="/esp32-pwm-driver-prototype/final-cold.jpg"/><figcaption>
+            <h4>Cold</h4>
+        </figcaption>
+</figure>
+
+<figure><img src="/esp32-pwm-driver-prototype/final-ha.jpg"/><figcaption>
+            <h4>Home Assistant view</h4>
+        </figcaption>
+</figure>
+</p>
+<p>This took me 3 days to source the parts and assemble. And also buy another ESP32 after burning it down with 12V :)</p>
+<p>Total cost for that single setup I’ve done I estimate to around:</p>
+<ul>
+<li>20PLN (~$6) for 2m of LEDs</li>
+<li>40PLN (~$10) for ESP32 dev board (fun fact – ESP32-S2 without dev board in bulk costs 9PLN)</li>
+<li>30 PLN (~$8,5) for LED mounts and wire</li>
+<li>5 PLN (~$1.5) for MOSFETs</li>
+<li>Endless ($$$) amount of money from time spent on it.</li>
+<li>Summing it up – it seems to cost around $30 for one controller.</li>
+</ul>
+<p>One of the nice things about doing this is that if you direct these LEDs at the ceiling or walls (which in my case are white) – light spreads and diffuses nicely so everything around is also lit.
+Thanks to that I can sit in a room which is not totally dark, yet has enough light to not cause an eye strain when lying/sitting by the TV/PC.</p>
+<h2 id="summary">Summary</h2>
+<p>This was fun to make. And by fun I mean it actually motivated me to complete it (although I’m not happy with that messy breadboard I made).
+This is excellent example that sometimes all you need is some variety on what you’re doing.</p>
+<p>Even though this lighting was… mostly unnecessary, I could’ve bought just more Yeelight bulbs or just not do it,
+I’ve decided to do it because I wanted to learn something (understand how MOSFET work!), and it was great time sink for past two-three days.</p>
+<p>Next will be designing my own PCB with 12 channels of output for maximum of 4 strips,
+with integrated power supply all in a single 3D printed box that has connectors for LED strips and connector for AC power.</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
