@@ -1,0 +1,27 @@
+baseURL = "https://flicksfix.com/"
+languageCode = "en-us"
+title = "Writing about code, electronics and other stuff"
+theme = "custom-theme"
+sectionPagesMenu = "main"
+
+# [menu]
+#     [[menu.main]]
+#         identifier = "about"
+#         name = "About Me"
+#         url = "/blog/"
+#         weight = 1
+#     [[menu.main]]
+#         identifier = "posts"
+#         name = "Blog"
+#         url = "/posts/"
+#         weight = 2
+#     [[menu.main]]
+#         identifier = "projects"
+#         name = "Projects"
+#         url = "/projects/"
+#         weight = 3
+#     [[menu.main]]
+#         identifier = "contacts"
+#         name = "Contact"
+#         url = "/contact/"
+#         weight = 4

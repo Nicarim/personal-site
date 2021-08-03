@@ -1,0 +1,14 @@
+<h2 class="title is-2 block has-text-centered"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">{{ .Site.Title }}</h2>
+<nav>
+    <ul class="columns">
+        {{ $currentPage := .}}
+        {{ range .Site.Menus.main }}
+
+        <li class="column">
+            <a class="button {{- if or ($currentPage.IsMenuCurrent "main" .) ($currentPage.HasMenuCurrent "main" .) }} is-ghost {{ else }} is-text {{ end }} is-fullwidth " href="{{.URL}}">{{ .Name }}</a>
+        </li>
+        {{ end }}
+    </ul>
+</nav>
+<hr/>

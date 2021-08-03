@@ -1,0 +1,3 @@
+{{ $sass := resources.Get "sass/bulma-custom.sass" }}
+{{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
+<link rel="stylesheet" href="{{ $style.Permalink }}">
