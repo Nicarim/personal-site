@@ -1,3 +1,5 @@
 {{ $sass := resources.Get "sass/bulma-custom.sass" }}
 {{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
 <link rel="stylesheet" href="{{ $style.Permalink }}">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
