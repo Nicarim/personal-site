@@ -1,5 +1,6 @@
 
 $body-line-height: 1.5
+$subtitle-color: #a0a0a0 !important
 $family-sans-serif: 'Libre Baskerville', BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif
 @import 'bulma/bulma'
 
@@ -7,5 +8,8 @@ $family-sans-serif: 'Libre Baskerville', BlinkMacSystemFont, -apple-system, "Seg
   .is-hidden-print
     display: none !important
 
+.content img 
+  height: none
 
-
+h2:not(.is-spaced) + .subtitle 
+    margin-top: -1.25rem;
