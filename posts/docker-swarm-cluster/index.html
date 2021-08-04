@@ -25,7 +25,7 @@ Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, refe
 
 	
 
-<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.85378bbdafeecc16943dc662ced5cf093862c270a7d2b979181dcd9f0d53a3b2.css">
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -86,29 +86,29 @@ I will be explaining that in later posts if I find time or motivation to do so.<
 <li>I will deploy database (will be deciding on postgres/mysql?) on database node.</li>
 <li>I will deploy an interesting app that I found and might be useful to me — <a href="https://github.com/the-paperless-project/paperless">paperless</a>.</li>
 </ul>
-<figure><img src="/docker-swarm-cluster/laptop-server-router.jpeg"/><figcaption>
+<figure><img src="/docker-swarm-cluster/laptop-server-router.jpeg"style=""
+    /><figcaption>
             <h4>My homelab setup — Lenovo 500S-13ISK-80Q2 running with Intel I5–6700U, 8GB of RAM, dual boot with windows and proxmox based on debian. Connected to OpenWRT based router. In the background BananaPI M1 not connected at all.</h4>
         </figcaption>
 </figure>
-
 <h2 id="intention-of-the-post"><strong>Intention of the post</strong></h2>
 <p>I want to document everything that I was doing with it — not just for sake of doing it — but also to interest anyone out there that wants to try it out to see how easy/hard/interesting can that be. So I will be including the simplest things here that I had in mind when choosing to do one way and not the other.</p>
 <h1 id="creating-nodes-on-proxmox">Creating nodes on Proxmox</h1>
 <p>Plan is to have 3 nodes, with 2 GB of RAM each and 1 CPU core have them run docker swarm cluster. Why not k8s or k3s or Nomad? Simplicity. I got really overwhelmed with amount of stuff you have to grasp to get them all running, and deploy anything on then that I decided to go with the simplest tool I know and expand out of that. This way I can find out how and why swarm might be limiting me. Or it wouldn’t at all for my use case?</p>
 <h2 id="operating-system">Operating system</h2>
-<figure><img src="/docker-swarm-cluster/master-lena-node.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/master-lena-node.png"style=""
+    /><figcaption>
             <h4>To upload an image, I simply choose the local storage on that server which I got by default when installing Proxmox, and upload it via the button.</h4>
         </figcaption>
 </figure>
-
 <p>I choose to go with <a href="https://ubuntu.com/download/server">Ubuntu Server 19.10</a>. Why precisely Ubuntu? I’m familiar with it as it was my main go-to OS when setting up cloud servers at work. Also I lack few things in Debian (like missing sudo). I download image on to my computer, and then upload it to Proxmox via its web interface.</p>
 <p>Proxmox by default doesn’t ship with any image at all for virtual machines, so to have anything running you first need to have any image uploaded to its store.</p>
 <h2 id="creating-nodes">Creating nodes</h2>
 <p>On the right hand corner of the interface, there are two buttons for creating an instance on Proxmox.</p>
 <p>You can either create VM or a CT (Container using LXC). I know that CTs might be easier on the system, but to have docker running inside a CT <a href="https://forum.proxmox.com/threads/docker-in-lxc-container.45204/">you have to go through additional setup</a> on the host and I wanted to keep Proxmox supervisor as vanilla as it can be in case I migrate it to a better hardware.</p>
-<figure><img src="/docker-swarm-cluster/create-virtual-machine.png"/>
+<figure><img src="/docker-swarm-cluster/create-virtual-machine.png"style=""
+    />
 </figure>
-
 <p>So I choose to create virtual machine. First step is to assign it a name and ID. While ID I will leave to whatever PVE chooses me, the name I want to set something fancy (not some <em>first-try-node-why-lol-it-sucks</em>). For that I will resort to give it a naming schema.</p>
 <p><code>pvevm-&lt;random_generated_name&gt;-node</code></p>
 <p>Where <em>pvevm</em> will stand for <strong>P</strong>roxmox<strong>VE</strong> (this way I will know where this machine even comes from when going through DHCP list on my router), for random generated name I will just use <a href="https://www.fantasynamegenerators.com/evil_names.php">villain names</a></p>
@@ -121,27 +121,27 @@ I will be explaining that in later posts if I find time or motivation to do so.<
 <p>Why so much hassle with the name? Because it will be also used as a hostname for that machine and it will be a lot easier to refer to them via DNS</p>
 <p>My router is setup to redirect requests with hostnames to their IP so <em>pvevm-coltontrevil-node.lan</em> will directly translate to its current IP. This way I don’t have to assign static IPs and collide with anything on the network I currently have. Also worth to note here that all nodes that I create are bridged to my current network so they’re visible on the same level as their hypervisor and using same DHCP/DNS server.</p>
 <p>Enough about the name, lets move forward.</p>
-<figure><img src="/docker-swarm-cluster/final-result.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/final-result.png"style=""
+    /><figcaption>
             <h4>Final result for one of the nodes.</h4>
         </figcaption>
 </figure>
-
 <p>In next tabs I select OS image, one we just uploaded, size of hard disk, which will be for now only 10 GB for each because whole host runs only on 50 GB (an extra challenge lets say). I assign it one core, 2048 MB of RAM, connect it to vmbr0 which is the bridge I mentioned. Rest of the settings I left on default.</p>
 <h2 id="getting-nodes-running">Getting nodes running</h2>
 <p>After creating the nodes, I will just spin them up all at once and connect via VNC to them.
 Proxmox has noVNC built in that let’s you use VNC in the browser so it will be an easy experience.
 Only drawback is that you cannot copy and paste to that VNC.</p>
-<figure><img src="/docker-swarm-cluster/three-nodes-running.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/three-nodes-running.png"style=""
+    /><figcaption>
             <h4>Three nodes up and running with pending installation</h4>
         </figcaption>
 </figure>
-
 <p>While installing I got the notification that there is newer version of the installer — I choose to go with the flow and use the newer one as it proposes.</p>
-<figure><img src="/docker-swarm-cluster/filesystem-setup.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/filesystem-setup.png"style=""
+    /><figcaption>
             <h4>Outcome is the same for all machines — 1 MB for grub, rest for OS.</h4>
         </figcaption>
 </figure>
-
 <p>Standard installation continues — Layout and locale choosing, network interface set up, http proxy, mirror URL, and partitioning.
 For partitioning I will just use entire disk that was assigned and use automated installation on that disk.</p>
 <p>Now to the tricky part that requires more than one second of a thought.
@@ -150,31 +150,31 @@ For that I’ll just go with my name abbreviation firstname + first letter of la
 There is also <strong>your server’s name</strong> which I would like to be the same as the one we assigned it in PVE.
 Happily I can see the host name at the top of the window, so I just rewrite it for each of the server.</p>
 <p>Password can be set to anything, as in next step we will be able to disable login on SSH using it.</p>
-<figure><img src="/docker-swarm-cluster/openssh-monit.png"/>
+<figure><img src="/docker-swarm-cluster/openssh-monit.png"style=""
+    />
 </figure>
-
 <p>Next monit is about Openssh server — we do want to explicitly enable it — this way after installation we will be in control of it using our desktop tool (terminal, ansible) instead of using VNC.</p>
 <p>Also, it seems that you’re able to set up a public key right from this interface by importing it from remote location — that really makes our life easier here.</p>
 <p>I will use GitHub source for that, simply adding the ssh key to the profile, or reuse the existing one — and type in your profile name into the field.</p>
 <p>Next step asks for installing any of the popular applications — I don’t want to use it since I will be using Ansible in next steps to automate the set-up.</p>
-<figure><img src="/docker-swarm-cluster/failed-cdrom.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/failed-cdrom.png"style=""
+    /><figcaption>
             <h4>Such a simple thing I’m doing and already some errors</h4>
         </figcaption>
 </figure>
-
 <p>After going through the last step I’m just waiting for installation to complete. For the SSD that I use in that laptop it took me 2 more minutes, after that I’m prompted to reboot the server. Sadly on PVE it fails to unmount the /cdroom after attempting to reboot, so I have to hit the enter again. You can safely ignore these warnings as PVE is set up to use HDD first so the reboot will be right into our freshly installed Ubuntu server.</p>
-<figure><img src="/docker-swarm-cluster/ready-cloudinit.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/ready-cloudinit.png"style=""
+    /><figcaption>
             <h4>Ready after approx. 42 seconds each.</h4>
         </figcaption>
 </figure>
-
 <h2 id="checking-if-everything-went-smooth">Checking if everything went smooth.</h2>
 <p>For a simple check up I will try to log in using the SSH key which was imported from my GitHub.</p>
-<figure><img src="/docker-swarm-cluster/success-ssh.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/success-ssh.png"style=""
+    /><figcaption>
             <h4>Log in working out of the box using hostname and login set up in the installation</h4>
         </figcaption>
 </figure>
-
 <h1 id="automation-with-ansible">Automation with Ansible</h1>
 <p>Since we’re setting up a cluster — that means we have to operate on more than one server. Because of it — automation tool is really needed to get anything working since it will take just too much time to do it manually. Thankfully there are simple solutions that you can use to also achieve the automation and that is <strong>&gt;ANSIBLE&lt;</strong> which is really powerful yet simple tool to setup things at many places at once.</p>
 <h2 id="ansible-pre-requirements">Ansible pre-requirements</h2>
@@ -223,9 +223,9 @@ The interpreter is here explicitly set because we want to be sure we will be usi
 <p>And that’s it — we’re ready to operate our cluster using Ansible.</p>
 <p>To test it out we can call Ansible ping module on all the nodes.</p>
 <p><strong>Important remark</strong>: Whenever you want to work in the project — remember to run <code>pipenv shell</code> first this way Ansible will be visible in our terminal (you have to do it each time you want to work in a new terminal window).</p>
-<figure><img src="/docker-swarm-cluster/ansible-test.png"/>
+<figure><img src="/docker-swarm-cluster/ansible-test.png"style=""
+    />
 </figure>
-
 <p>Running <code>ansible -m ping pvevm-nodes</code> we should see above result in our terminal — this means Ansible is able to correctly connect to all the hosts in the group.</p>
 <h1 id="installing-docker-using-ansible">Installing docker using Ansible</h1>
 <p>We don’t have to write all of our playbooks (scripts composed of roles) by ourselves —
@@ -512,19 +512,19 @@ overall progress: 1 out of 1 tasks
 1/1: running   [==================================================&gt;]   
 verify: Service converged
 </code></pre><p>Since I already had service of <code>helloworld</code> ran, I got now two services, lets see where they got replicated.</p>
-<figure><img src="/docker-swarm-cluster/swarm-cluster.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/swarm-cluster.png"style=""
+    /><figcaption>
             <h4>Swarm is working — we created two services and they got balanced on the worker nodes</h4>
         </figcaption>
 </figure>
-
 <h1 id="wrap-up">Wrap up</h1>
 <p>If you made it to the end — congratulations, because this is my first blog post and if it was any interesting to you leave me a comment to cheer me up. Writing this post itself made me actually do a lot to know what I wanted to do in the end. And it made a nice way to keep me motivated to finish it (since I wanted to have it finished not left halfway through!)</p>
 <p>While the Ansible playbook that I wrote could have been a lot better — this gives a nice overview through what you need to go through to actually have a simple swarm running from almost literally a ground up.</p>
-<figure><img src="/docker-swarm-cluster/wrap-up.png"/><figcaption>
+<figure><img src="/docker-swarm-cluster/wrap-up.png"style=""
+    /><figcaption>
             <h4>Overview of what was achieved</h4>
         </figcaption>
 </figure>
-
 <p>I might go into another post on how to have an application running on it — but until then see you soon</p>
 
         </article>

@@ -26,7 +26,7 @@ I can either tinker in my &ldquo;electronic workshop&rdquo; or do programming wh
 
 	
 
-<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.85378bbdafeecc16943dc662ced5cf093862c270a7d2b979181dcd9f0d53a3b2.css">
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -78,11 +78,11 @@ I can either tinker in my &ldquo;electronic workshop&rdquo; or do programming wh
 <p><strong>It&rsquo;s not really only you dear reader whom might have this problem too!</strong></p>
 <p>I&rsquo;ve taken 3 weeks of free vacation to do things I&rsquo;ve always wanted to do but instead I spent half of it playing games (which I don&rsquo;t regret!)
 and half of it&hellip; doing absolutely nothing and lying in the bed.</p>
-<figure><img src="/esp32-pwm-driver-prototype/soldering-setup.jpg"/><figcaption>
+<figure><img src="/esp32-pwm-driver-prototype/soldering-setup.jpg"style=""
+    /><figcaption>
             <h4>DIY workshop that I&#39;ve assembled over time</h4>
         </figcaption>
 </figure>
-
 <p>But enough of the depressive kind of things, and let&rsquo;s dive deep into actual stuff I&rsquo;ve done.</p>
 <h2 id="constraints">Constraints</h2>
 <p>I rent a flat.
@@ -100,18 +100,18 @@ Idea came to my mind that I could use double-sided tape and LEDs strips inside L
 It claimes to be 12W per meter, and cost me around 11 PLN/meter (around $2) so I’ve bought around 7 meters of it.</p>
 <p>This strip was dual LED per cell so it had “warm” and cold LED in a single chip.
 It was wired the same way RGB strips are wired (4 wires) but one of the wires was simple not used.</p>
-<figure><img src="/esp32-pwm-driver-prototype/led-strip.jpg"/><figcaption>
+<figure><img src="/esp32-pwm-driver-prototype/led-strip.jpg"style=""
+    /><figcaption>
             <h4>Dual Warm/Cold LED strip</h4>
         </figcaption>
 </figure>
-
 <p>One problem was that the “warm” light of that strip is not really warm as in orange in its maximum setting
 but more of a white + a tiny bit of green/yellow.
 On the other hand cold one was actually pretty cold. But I guess I won’t complain about such a cheap strip.</p>
 <h3 id="power-adapter">Power Adapter</h3>
-<figure><img src="/esp32-pwm-driver-prototype/power-adapter.jpg"/>
+<figure><img src="/esp32-pwm-driver-prototype/power-adapter.jpg"style=""
+    />
 </figure>
-
 <p>Nothing special. Because I intended to have three sectors of lights, I’ve chosen 12V / 3A in a DIY package.
 One end you add the AC cable, the other way you got 12V. And it is pretty so you can hide it somewhere invisible.
 I plan to put it inside a 3D Printed case with controller so all I do is plug the power and connect the LEDs through exposed connectors.
@@ -122,11 +122,11 @@ While ESP8266 is cheaper, and I don’t care about performance in that particula
 Reason for choosing ESP32 was that it has built in dedicated PWM support.
 <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/ledc.html">See related documentation entry on espressif</a>.
 What that means is that I can set the brightness of the LED through GPIO output of my ESP32.</p>
-<figure><img src="/esp32-pwm-driver-prototype/esp32-wroom.jpeg"/><figcaption>
+<figure><img src="/esp32-pwm-driver-prototype/esp32-wroom.jpeg"style=""
+    /><figcaption>
             <h4>ESP32 NodeMCU v1.1 dev kit</h4>
         </figcaption>
 </figure>
-
 <p>I could’ve done software PWM on ESP8266 but <a href="https://esphome.io/components/output/esp8266_pwm.html">documentation of ESPHome</a>
 said that it&rsquo;s preferred to use dedicated PWM hardware instead.</p>
 <p>Since I hate flickering of any sort I’ve decided to use dedicated PWM of ESP32 and set the frequency high enough that I won’t see any flicker at all.</p>
@@ -136,16 +136,16 @@ That is horrible and I can’t stand it. I didn&rsquo;t even want a chance of it
 <h3 id="other-stuff">Other stuff</h3>
 <p>Other than that, I’ve also bought 4 core cable dedicated to soldering to these strips.
 This is a lot better than wiring it all separately since it will create unbelievable mess if you use single wires for each connection.</p>
-<p><figure><img src="/esp32-pwm-driver-prototype/four-core-wire.jpg"/><figcaption>
+<p><figure><img src="/esp32-pwm-driver-prototype/four-core-wire.jpg"style=""
+    /><figcaption>
             <h4>Four core wire</h4>
         </figcaption>
 </figure>
-
-<figure><img src="/esp32-pwm-driver-prototype/led-troughs-45degree.jpg"/><figcaption>
+<figure><img src="/esp32-pwm-driver-prototype/led-troughs-45degree.jpg"style=""
+    /><figcaption>
             <h4>led troughs 45 degree</h4>
         </figcaption>
-</figure>
-</p>
+</figure></p>
 <h2 id="on-pwm-control">On PWM Control</h2>
 <p>For anyone who is familiar with electronics and PWM, just skip it.
 For anyone else here comes a fast explanation of what PWM means.</p>
@@ -229,14 +229,14 @@ But we can’t send let’s say 1A of current through our GPIO directly to the L
 It also gave me an idea to create my own board but that will come later :)</p>
 <p>For my application, I’ve used <strong>IRL540N</strong> MOSFET transistor that I had lying around.</p>
 <p>Since I had two channels, I connected two GPIOs to two seperate MOSFETs (to control cold/warm LED independently).</p>
-<p><figure><img src="/esp32-pwm-driver-prototype/board-view-1.jpg"/><figcaption>
+<p><figure><img src="/esp32-pwm-driver-prototype/board-view-1.jpg"style=""
+    /><figcaption>
             <h4>Beautiful board isn&#39;t it?</h4>
         </figcaption>
 </figure>
-
-<figure><img src="/esp32-pwm-driver-prototype/board-view-2.jpg"/>
-</figure>
-</p>
+<figure><img src="/esp32-pwm-driver-prototype/board-view-2.jpg"style=""
+    />
+</figure></p>
 <p>This is really messy on the breadboard, but easy in reality:</p>
 <ul>
 <li>On the left image you can see ESP32, 3.3V buck converter, and two MOSFETs (and 2,54mm connector)</li>
@@ -249,21 +249,21 @@ it doesn’t matter when it on running. But when its off, we don’t want any fl
 </ul>
 <h2 id="final-result">Final result</h2>
 <p>Images speak for itself.</p>
-<p><figure><img src="/esp32-pwm-driver-prototype/final-warm.jpg"/><figcaption>
+<p><figure><img src="/esp32-pwm-driver-prototype/final-warm.jpg"style=""
+    /><figcaption>
             <h4>Warm</h4>
         </figcaption>
 </figure>
-
-<figure><img src="/esp32-pwm-driver-prototype/final-cold.jpg"/><figcaption>
+<figure><img src="/esp32-pwm-driver-prototype/final-cold.jpg"style=""
+    /><figcaption>
             <h4>Cold</h4>
         </figcaption>
 </figure>
-
-<figure><img src="/esp32-pwm-driver-prototype/final-ha.jpg"/><figcaption>
+<figure><img src="/esp32-pwm-driver-prototype/final-ha.jpg"style=""
+    /><figcaption>
             <h4>Home Assistant view</h4>
         </figcaption>
-</figure>
-</p>
+</figure></p>
 <p>This took me 3 days to source the parts and assemble. And also buy another ESP32 after burning it down with 12V :)</p>
 <p>Total cost for that single setup I’ve done I estimate to around:</p>
 <ul>
