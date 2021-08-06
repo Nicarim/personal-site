@@ -4,6 +4,8 @@ date: 2021-08-04T20:23:53+02:00
 draft: false
 ---
 
+UPDATE (2021-08-06): In a hindsight I think I choose wrong title to describe the concept. More appropriate would be "Modern infra automation state management is gateway drug for using more cloud provided services" or something along these lines. Initial thought on title came from the fact that I considered terraform/pulumi to be truly "Infra as a code" solution, while Ansible (second tool that I use for automation) being subpar in that experience (and hence more of "commands over SSH" thing than true infra state manager).  
+
 I'm a big fan of using IaaC tooling in all of my DevOps jobs.
 It's a great pleasure to be able to define your infrastructure in a code and exactly know 
 what do you have in your cloud. It helps you avoid the situation where you have to ask people in the company to know where something lives. You can simply `CTRL+F` through the project (assuming you store it in a single repo) and you always know where something is.

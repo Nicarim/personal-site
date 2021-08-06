@@ -6,7 +6,7 @@
     
     <title>Infra as a Code Is Cloud Lock-In | Writing about code, electronics and other stuff</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="I&rsquo;m a big fan of using IaaC tooling in all of my DevOps jobs. It&rsquo;s a great pleasure to be able to define your infrastructure in a code and exactly know what do you have in your cloud. It helps you avoid the situation where you have to ask people in the company to know where something lives. You can simply CTRL&#43;F through the project (assuming you store it in a single repo) and you always know where something is.">
+    <meta name="description" content="UPDATE (2021-08-06): In a hindsight I think I choose wrong title to describe the concept. More appropriate would be &ldquo;Modern infra automation state management is gateway drug for using more cloud provided services&rdquo; or something along these lines. Initial thought on title came from the fact that I considered terraform/pulumi to be truly &ldquo;Infra as a code&rdquo; solution, while Ansible (second tool that I use for automation) being subpar in that experience (and hence more of &ldquo;commands over SSH&rdquo; thing than true infra state manager).">
     <meta name="generator" content="Hugo 0.86.0" />
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
@@ -69,7 +69,8 @@
   <h1 class="title is-2">Infra as a Code Is Cloud Lock-In</h1>
   <div>
         <article class="content has-text-justified">
-           <p>I&rsquo;m a big fan of using IaaC tooling in all of my DevOps jobs.
+           <p>UPDATE (2021-08-06): In a hindsight I think I choose wrong title to describe the concept. More appropriate would be &ldquo;Modern infra automation state management is gateway drug for using more cloud provided services&rdquo; or something along these lines. Initial thought on title came from the fact that I considered terraform/pulumi to be truly &ldquo;Infra as a code&rdquo; solution, while Ansible (second tool that I use for automation) being subpar in that experience (and hence more of &ldquo;commands over SSH&rdquo; thing than true infra state manager).</p>
+<p>I&rsquo;m a big fan of using IaaC tooling in all of my DevOps jobs.
 It&rsquo;s a great pleasure to be able to define your infrastructure in a code and exactly know
 what do you have in your cloud. It helps you avoid the situation where you have to ask people in the company to know where something lives. You can simply <code>CTRL+F</code> through the project (assuming you store it in a single repo) and you always know where something is.</p>
 <p>Two(three?) biggest tools in that area are <a href="https://www.terraform.io/">Terraform</a> (best with <a href="https://terragrunt.gruntwork.io/">Terragrunt</a>) and <a href="https://www.pulumi.com/">Pulumi</a>. These tools allow for (almost) full idempotency when setting up environment in your cloud provider. Once things are deployed, you can be sure that what is in the cloud - is in fact there. You can then create different environments for your service and work based on that assumption.</p>

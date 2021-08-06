@@ -24,7 +24,7 @@ An example of that you can find below
       <pubDate>Wed, 04 Aug 2021 20:23:53 +0200</pubDate>
       
       <guid>https://flicksfix.com/posts/infra-as-a-code-is-cloud-lock-in/</guid>
-      <description>I&amp;rsquo;m a big fan of using IaaC tooling in all of my DevOps jobs. It&amp;rsquo;s a great pleasure to be able to define your infrastructure in a code and exactly know what do you have in your cloud. It helps you avoid the situation where you have to ask people in the company to know where something lives. You can simply CTRL+F through the project (assuming you store it in a single repo) and you always know where something is.</description>
+      <description>UPDATE (2021-08-06): In a hindsight I think I choose wrong title to describe the concept. More appropriate would be &amp;ldquo;Modern infra automation state management is gateway drug for using more cloud provided services&amp;rdquo; or something along these lines. Initial thought on title came from the fact that I considered terraform/pulumi to be truly &amp;ldquo;Infra as a code&amp;rdquo; solution, while Ansible (second tool that I use for automation) being subpar in that experience (and hence more of &amp;ldquo;commands over SSH&amp;rdquo; thing than true infra state manager).</description>
     </item>
     
     <item>
