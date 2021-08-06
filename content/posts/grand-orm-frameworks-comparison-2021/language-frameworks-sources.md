@@ -5,7 +5,7 @@ draft: true
 ---
 
 ## Sources
-List of places I consulted for finding informations
+List of places I consulted for finding informations. I also used Google to find frameworks, but didn't include search here as that may not lead to same information.
 
 ### Choice of languages to consider
 - https://pypl.github.io/PYPL.html
@@ -26,6 +26,7 @@ List of places I consulted for finding informations
 ### Java
 - https://www.reddit.com/r/java/comments/5oit04/finding_the_best_java_orm_framework_for_postgresql/
 - https://www.reddit.com/r/java/comments/einrg0/for_java_applications_is_orm_or_sql_more_common/
+- https://dzone.com/articles/best-java-orm-frameworks-for-postgresql
 
 ### Go
 - https://github.com/shafferjohn/Go-ORM-Frameworks-Ranking
@@ -58,6 +59,27 @@ List of places I consulted for finding informations
 - https://github.com/ziadoz/awesome-php#database
 - https://www.slant.co/topics/5639/~php-orms
 
+### Scala
+- https://stackoverflow.com/questions/1140448/what-orms-work-well-with-scala
+
+### Dart
+- https://project-awesome.org/yissachar/awesome-dart#orm
+
+### C
+- https://stackoverflow.com/questions/10577006/is-there-some-convenient-orm-library-framework-for-c
+
+### Perl
+- https://stackoverflow.com/questions/281440/is-there-an-orm-for-perl
+- https://github.com/hachiojipm/awesome-perl#database
+
+### R
+- https://stackoverflow.com/questions/11988011/is-there-a-package-for-object-relational-mapping-in-r
+
+### Obj-C
+- https://stackoverflow.com/questions/8545392/objective-c-orm/23690458
+
+### COBOL
+- https://github.com/mickaelandrieu/awesome-cobol
 
 ## Criterias
 
@@ -85,9 +107,23 @@ This is the list of languages that were considered for following comparison.
 - C++
 - Elixir
 - PHP
+- Scala
+- Swift
+- Kotlin
+- Perl
+- Julia
+- Pascal
+- Groovy
+- Common Lisp
+- Ada
 
 These languages were considered, but didn't have viable candidates (no popular ORM framework matching criterias)
-
+- Dart
+- C
+- Lua
+- R
+- Obj-C
+- COBOL
 
 ## Considered frameworks
 
@@ -136,6 +172,8 @@ According to chosen languages, I've made a research on available ORM frameworks 
 - [Apache JDO](http://db.apache.org/jdo/index.html) (?)
 - [jOOQ](https://www.jooq.org/) (?)
 - [Oracle TopLink](https://www.oracle.com/middleware/technologies/top-link.html) (?)
+- [relademo](https://github.com/goldmansachs/reladomo) (?)
+- [speedment stream](https://github.com/goldmansachs/reladomo) (?)
 - [~~jdbi~~](http://jdbi.org/#_third_party_integration) - no mysql support
 
 ### Go
@@ -217,5 +255,55 @@ According to chosen languages, I've made a research on available ORM frameworks 
 - [~~Pomm~~](https://github.com/chanmix51/Pomm) - supports only postgres, not in active development since 2014-11-04
 - [~~VoodOrm~~](https://github.com/mardix/VoodOrm) - not in active development since 2014-05-05
 
-### Clojure
-- [HugSQL](https://www.hugsql.org/) - Included because accidentally found it :)
+### Scala
+- [Slick](https://scala-slick.org/) - more like FRM (Functional relational mapping?) (?)
+- [~~circumflex ORM~~](https://github.com/inca/circumflex) - not in active development since 2012-10-14 
+- [~~lift ORM~~](https://liftweb.net) - not in active development since 2018-07-21
+
+### Dart
+- [~~liquidart ORM~~](https://aldrinsartfactory.github.io/liquidart/) - no support for mysql / sqlite
+- [~~jaguar_orm~~](https://github.com/Jaguar-dart/jaguar_orm) - no support for mysql / sqlite, not in active development since 2019-06-29
+- [~~Conduit ORM~~](https://gitbook.theconduit.dev/) - no support for SQLite
+- [~~Aqueduct ORM~~](https://aqueduct.io) - only supports postgreSQL
+- [~~Dart ORM~~](https://github.com/ustims/DartORM) - not in active development since 2018-06-03
+- Unable to find viable framework.
+
+### Swift
+- [Swift Kuery ORM](https://github.com/Kitura/Swift-Kuery-ORM) (✓)
+- [fluent](https://github.com/vapor/fluent) (✓)
+- [~~Perfect CRUD~~](https://github.com/PerfectlySoft/Perfect-CRUD) - not in active development since 2020-01-21
+
+### Kotlin
+- [ktorm](https://github.com/kotlin-orm/ktorm) (✓)
+- [Exposed](https://github.com/JetBrains/Exposed) (✓)
+- Anything in Java like ebean (?) 
+
+### C
+- This was really just an attempt, at [best found this](http://ales.jikos.cz/smorm/) 
+
+### Lua
+- [~~Orbit ORM~~](http://keplerproject.github.io/orbit/reference.html) - supports only sqlite / mysql
+
+### Perl
+- [DBIx-Class](https://metacpan.org/dist/DBIx-Class) (✓)
+- [~~Rose-DB~~](https://metacpan.org/release/JSIRACUSA/Rose-DB-0.758/view/lib/Rose/DB.pm) - not in active development since 2010-01-26
+- [~~Fey ORM~~](https://metacpan.org/dist/Fey-ORM) - not in active development since 2015-07-12
+
+### Obj-C
+- [~~Shark ORM~~](https://github.com/sharksync/sharkorm) - not in active development since 2019-12-21
+
+### Julia
+- [SeachLight](https://github.com/GenieFramework/SearchLight.jl) (✓)
+
+### Pascal
+- [mORMot](https://github.com/synopse/mORMot) (✓)
+
+### Groovy
+- [grails gorm](https://gorm.grails.org/) (✓)
+
+### Common Lisp
+- [Mito](https://github.com/fukamachi/mito) (✓)
+- [~~clsql-orm~~](https://github.com/AccelerationNet/CLSQL-ORM) - not in active development since 2016-01-04
+
+### Ada
+- [Ada Ado](https://github.com/stcarrez/ada-ado) (✓)
