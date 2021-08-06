@@ -6,7 +6,18 @@
     <description>Recent content in Blog on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 04 Aug 2021 20:23:53 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 05 Aug 2021 17:07:59 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Living in the IDE - or Why I Really Like HCL and Loathe YAML</title>
+      <link>https://flicksfix.com/posts/living-in-the-ide/</link>
+      <pubDate>Thu, 05 Aug 2021 17:07:59 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/living-in-the-ide/</guid>
+      <description>There are things that I enjoy when working as a professional. One of them is that when the tooling is so good that it just makes want to write the code. Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.
+An example of that you can find below
+ Autocomplete works out of the box, no configuration needed   One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!</description>
+    </item>
+    
     <item>
       <title>Infra as a Code Is Cloud Lock-In</title>
       <link>https://flicksfix.com/posts/infra-as-a-code-is-cloud-lock-in/</link>

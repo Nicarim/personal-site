@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Living in the IDE - or Why I Really Like HCL and Loathe YAML | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="There are things that I enjoy when working as a professional. One of them is that when the tooling is so good that it just makes want to write the code. Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.
+An example of that you can find below
+ Autocomplete works out of the box, no configuration needed   One might say &ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!">
+    <meta name="generator" content="Hugo 0.86.0" />
+    
+    <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+  </head>
+
+  <body >
+    <div class="is-hidden-print">
+      <h2 class="title is-2 block has-text-centered mt-6"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    </div>
+    <main role="main" class="container pl-4 pr-4">
+      
+<section id="main">
+  <h1 class="title is-2">Living in the IDE - or Why I Really Like HCL and Loathe YAML</h1>
+  <div>
+        <article class="content has-text-justified">
+           <p>There are things that I enjoy when working as a professional.
+One of them is that when the tooling is so good that it just makes want to write the code.
+Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.</p>
+<p>An example of that you can find below</p>
+<figure><img src="autocomplete-works-out-of-the-box.png"style=""
+    /><figcaption>
+            <h4>Autocomplete works out of the box, no configuration needed</h4>
+        </figcaption>
+</figure>
+<p>One might say &ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!&rdquo; like it often can be the case with dynamic languages.</p>
+<h3 id="simple-autocomplete">Simple autocomplete</h3>
+<video controls preload="auto" width="auto" style="height:400px;" playsinline class="html-video ">
+    <source src="/posts/living-in-the-ide/screencast-aws-instance.webm" type="video/webm">
+  <span></span>
+</video>
+<p>That looks good. Autocomplete tells us what basic blocks can we use to build our terraform module. How far can we stretch it?</p>
+<h3 id="autocomplete-of-variables">Autocomplete of variables</h3>
+<video controls preload="auto" width="auto" style="height:500px;" playsinline class="html-video ">
+    <source src="/posts/living-in-the-ide/screencast-var.webm" type="video/webm">
+  <span></span>
+</video>
+<p>You can see that variables are not a problem for autocomplete.</p>
+<h3 id="autocomplete-of-resources">Autocomplete of resources</h3>
+<video controls preload="auto" width="auto" style="height:500px;" playsinline class="html-video ">
+    <source src="/posts/living-in-the-ide/screencast-resource-dependency.webm" type="video/webm">
+  <span></span>
+</video>
+<p>This is a little bit harder - autocomplete is aware of the resource type and can propose its variables too!</p>
+<h3 id="autcomplete-of-modules">Autcomplete of modules</h3>
+<p>This is something I would not expect out of autocomplete. Terraform is able to index available modules (as long as you install them <code>terraform init</code>) and gives you autocomplete for that too!</p>
+<video controls preload="auto" width="auto" style="height:500px;" playsinline class="html-video ">
+    <source src="/posts/living-in-the-ide/screencast-module-autocomplete.webm" type="video/webm">
+  <span></span>
+</video>
+<p>If I&rsquo;m familiar with the module - I don&rsquo;t have to go to the documentation at all. I have all variables at my disposal and ready to be used. Its like magic for me.</p>
+<h3 id="using-ide-is-easier-than-using-aws-dashboard">Using IDE is easier than using AWS dashboard</h3>
+<p>This is somewhat a stretch, but what I mean by that is that if I know how a certain service works in AWS, for me personally its a lot easier to write terraform modules instead of clicking around in AWS. I don&rsquo;t want to dismiss the dashboard completely. If there is a service I didn&rsquo;t use yet, I explore its options using AWS dashboard, maybe even do a test run, and then go back to terraform file to write it down.</p>
+<p>I often lean on the side of <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a> when it comes working with technologies. For me its often easier to use provider&rsquo;s dashboard than to use CLI or god forbid API when documentation is not clear. It&rsquo;s the same for me in Python - I always try to add annotations where possible so that I don&rsquo;t have to go out of the editor to find out about variable. But not every package in python is annotated.</p>
+<p>But using terraform? I can do everything inside IDE without going out of it and keep being focused as I create thinks using magic dust of autocomplete.</p>
+<p>I can&rsquo;t say the same about other infra automation tools.</p>
+<h3 id="its-all-intentional">It&rsquo;s all intentional</h3>
+<p>Hashicorp has made explicit decision to support this kind of flow. They provide their <a href="https://github.com/hashicorp/terraform-ls">own official language server</a> for VSCode and other products that use LSP protocol</p>
+<p>While writing this paragraph I also wanted to mention IntelliJ support being official, but it looks like the <a href="https://plugins.jetbrains.com/plugin/7808-hashicorp-terraform--hcl-language-support/reviews">plugin is quite outdated</a>. While reviews are harsh and I have myself sometimes faced with the fact that something is not recognized - I still think its good enough for what I uset it for. Although I would appreciate if HashiCorp and/or Jetbrains has put some more effort into keeping this good and not to outdate this post praising their technology for free ;)</p>
+<h2 id="comparing-terraform-to-other-projects">Comparing terraform to other projects</h2>
+<p>I might be harsh to the ansible. I still consider the tool to be great and really helpful when working on infra automation. However, I just can&rsquo;t use it without frustrating myself.</p>
+<h3 id="documentation">Documentation</h3>
+<p>I was mainly focused on autocomplete features, but let&rsquo;s take a moment to compare both documentations of resources.</p>
+<figure><img src="terraform-resources-docs.png"style=" max-height:500px;"
+    /><figcaption>
+            <h4>Here is how it looks like in terraform. Beware - search on the left works immediately and precisely.</h4>
+        </figcaption>
+</figure>
+<p>How does it look like in Ansible?</p>
+<figure><img src="ansible-docs.png"style=" max-height:500px;"
+    /><figcaption>
+            <h4>Ansible - here is the best overview you can get</h4>
+        </figcaption>
+</figure>
+<p>I just don&rsquo;t know, I had to include this rant here. I really enjoy how easy it is to get an overview in terraform and how I lack it in ansible. I&rsquo;ve to make at least 3 clicks more to get into the same informations and search at best looks like this</p>
+<figure><img src="ansible-user-search.png"style=""
+    /><figcaption>
+            <h4>Looking for user module is like looking for needle in the haystack...</h4>
+        </figcaption>
+</figure>
+<p>Why do I mention documentation? You will see in a moment</p>
+<h2 id="working-in-ide-with-ansible">Working in IDE with Ansible</h2>
+<p>This has and is a big frustration of mine. I like Ansible, I like its simplicity and that you can easily make it for many things. But IDE support? Is non existent.</p>
+<p>Let&rsquo;s consider the same things I considered in terraform example.
+Again, using IntelliJ.</p>
+<h3 id="ansible-ide-plugin">Ansible IDE plugin</h3>
+<p>There are actually two plugins available. Or three, or four, I don&rsquo;t know. None of them are considered official by any means for IntelliJ.</p>
+<figure><img src="ansible-ide-plugin.png"style=" max-height:300px;"
+    /><figcaption>
+            <h4>Which one should I choose?</h4>
+        </figcaption>
+</figure>
+<p>There are three plugins which you can consider:</p>
+<ul>
+<li>YAML/Ansible support - free but outdated (last update Oct. 2020)</li>
+<li>OrchidE Ansible Language - Paid (!) (I don&rsquo;t have anything against paying, but if I were paid customer of Ansible, and then I have to pay for plugin created independently&hellip;)</li>
+<li>Ansible - this one is quite new and I just discovered it now.</li>
+</ul>
+<p>Opinions on the last choice were promising so I went with that one.</p>
+<h3 id="simple-autocomplete-1">Simple autocomplete</h3>
+<figure><img src="ansible-autocomplete-simple.png"style=""
+    /><figcaption>
+            <h4>We got some suggestions</h4>
+        </figcaption>
+</figure>
+<p>Just so you&rsquo;re aware, this is <a href="https://github.com/MSDehghan/AnsiblePlugin">quite fresh</a> plugin, with init commit 12 months ago. Before that things were not as easy.</p>
+<h3 id="autocomplete-of-resources-1">Autocomplete of resources</h3>
+<figure><img src="ansible-copy-autocomplete.png"style=""
+    /><figcaption>
+            <h4>How nice</h4>
+        </figcaption>
+</figure>
+<p>I didn&rsquo;t expect that, last time I checked at best there was nothing at this stage. Let&rsquo;s move further.</p>
+<figure><img src="ansible-copy-params.png"style=""
+    /><figcaption>
+            <h4>And we can see params too!</h4>
+        </figcaption>
+</figure>
+<p>Another nice surprise, we got support for the params.</p>
+<h3 id="autocomplete-of-variables-1">Autocomplete of variables</h3>
+<figure><img src="ansible-no-vars.png"style=""
+    /><figcaption>
+            <h4>Aaand it fails</h4>
+        </figcaption>
+</figure>
+<p>I very often work with variables in ansible, and autocomplete of that could be a blessing. Sadly no such nice things when using ansible.</p>
+<h3 id="autocomplete-of-roles">Autocomplete of roles</h3>
+<p>Following the same expectations from terraform - let&rsquo;s try autocomplete when it comes to community-made modules - called roles in ansible.</p>
+<p>For that I downloaded a role from a really popular role creator <a href="https://github.com/geerlingguy/ansible-role-apache">geerlingguy/ansible-role-apache</a></p>
+<figure><img src="ansible-role-name-autocomplete.png"style=""
+    /><figcaption>
+            <h4>We got list of available roles!</h4>
+        </figcaption>
+</figure>
+<p>I&rsquo;ve to give a big shoutout here to the creator of <a href="https://github.com/MSDehghan/AnsiblePlugin">this Ansible plugin</a> - really great job on making such things working at all! This is article is by no means criticism of lacking features in that plugin. Intention of this article was to point out such a big lack of support in YAML based tools and in fact, I&rsquo;m really happy to discover that it exists and will probably start to use it when working with Ansible.
+However, my point is that I&rsquo;d really <strong>expect Red Hat</strong> to actually make it work and make it good for the sanity of all developers working with Ansible.</p>
+<p>But good things always comes to an end - I&rsquo;ve tried to get list of variables that are accepted by the role and there is nothing :(.</p>
+<figure><img src="ansible-role-vars-no.png"style=""
+    /><figcaption>
+            <h4>And we don&#39;t get any info about the role&#39;s defaults</h4>
+        </figcaption>
+</figure>
+<p>This is yet again that thing that hinders my productivity a lot - when I&rsquo;ve to shuffle through many things to get to actually know what are my choices even. I just really enjoy that when without switching tabs (context) and always scratching my head &ldquo;where can I find this info?&rdquo; I can get all the info from autocomplete. That is why I even bother using IDE at all.</p>
+<h2 id="final-notes">Final notes</h2>
+<p>I think I have an idea where does the difference come from. There are two things that come to my mind:</p>
+<ul>
+<li>HashiCorp just cares about developers experience, and RedHat is just too big of a company to even care about it</li>
+<li>HCL was made with the premise in mind that <a href="https://github.com/hashicorp/hcl#why">YAML is not good enough for configuration language</a>. Parsing HCL and knowing from the context what values are accepted where is just a lot easier.</li>
+</ul>
+<p>Of course, there are a lot of criticizm for HCL lang. Just a quick search on <a href="https://www.google.com/search?hl=en&amp;q=hcl%20lang%20is%20bad">the internet</a> gives you some negativity on HCL, with comments being like</p>
+<blockquote>
+<p>Lol I totally agree. HCL combines the worst aspects of JSON and YAML into a single language! <a href="https://www.reddit.com/r/webdev/comments/i1jhl6/why_does_hashicorp_have_their_own_config_language/fzy1gdg/?utm_source=reddit&amp;utm_medium=web2x&amp;context=3">src</a></p>
+</blockquote>
+<blockquote>
+<p>HCL is a bad idea&hellip; Coming from a JSON/XML-only (read .NET) world, I&rsquo;ve found YAML to be straight-forward with a shallow learning-curve. Why not unify Hashicorp&rsquo;s config languages under YAML? <a href="https://github.com/hashicorp/hcl/issues/151#issue-176182414">src</a></p>
+</blockquote>
+<p>Be ware that this comments come from old days of HCL when it was pretty new idea.
+And based on the comparison above I could say following thing:
+<strong>Be careful what you wish for</strong></p>
+<p>HCL may have its issues, it may not be the best in class, but alternatives?
+YAML Is not any better, at best autocompletion for it is far worse because its structure is just arbitrary &ldquo;dicts of lists of values&rdquo;. HCL at least made it easier to be able to tell &ldquo;This is Resource, hence it accepts specific values&rdquo;. Even if its just fancy wrapper for JSONs. Makes life easier for everyone.</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
