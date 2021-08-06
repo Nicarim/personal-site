@@ -46,6 +46,19 @@ List of places I consulted for finding informations
 - http://ramaze.net/documentation/file.models.html
 - https://padrinorb.com/guides/getting-started/basic-projects/
 
+### Elixir
+- https://github.com/h4cc/awesome-elixir
+
+### C++
+- https://www.reddit.com/r/cpp/comments/698f5j/why_does_the_c_community_dont_have_a_famous_orm/
+- https://github.com/fffaraz/awesome-cpp#database
+- https://www.reddit.com/r/cpp/comments/9g9qky/whats_your_opinion_about_the_current_state_of_orm/
+
+### PHP
+- https://github.com/ziadoz/awesome-php#database
+- https://www.slant.co/topics/5639/~php-orms
+
+
 ## Criterias
 
 - Supports following databases, be it by acknowledged community effort or officially.
@@ -69,6 +82,9 @@ This is the list of languages that were considered for following comparison.
 - JavaScript/node.js
 - Rust
 - Ruby
+- C++
+- Elixir
+- PHP
 
 These languages were considered, but didn't have viable candidates (no popular ORM framework matching criterias)
 
@@ -170,6 +186,36 @@ According to chosen languages, I've made a research on available ORM frameworks 
 - [Ruby Object Mapper](https://rom-rb.org/) (?)
 - [~~DataMapper~~](https://github.com/datamapper/dm-core) - not in active development since 2016-05-25
 - [~~ripple~~](https://github.com/riak-ripple/ripple) - not in active development since 2016-10-06
+
+### Elixir
+- [Ecto](https://hexdocs.pm/ecto/Ecto.html) (✓)
+- [~~atlas~~](https://github.com/chrismccord/atlas) - not in active development since 2014-06-05
+
+### C++
+- [sqlpp11](https://github.com/rbock/sqlpp11) (✓)
+- [QxORM](https://github.com/QxOrm/QxOrm) (✓)
+- [~~odb~~](https://www.codesynthesis.com/products/odb/) - not in active development since 2019-03-19
+- [~~GigaBASE~~](https://sourceforge.net/projects/gigabase/) - not in active development since 2017-04-11 
+- [~~bun~~](https://github.com/BrainlessLabs/bun) - not in active development since 2019-10-24
+- [~~libpqxx~~](http://pqxx.org/development/libpqxx/) - only postgreSQL
+- [~~sqlite_orm~~](https://github.com/fnc12/sqlite_orm) - only SQLite
+
+### PHP
+- [doctrine](https://www.doctrine-project.org/) (✓)
+- [laravel eloquent](https://laravel.com/) (✓)
+- [Yii2 framework ActiveRecord](https://www.yiiframework.com/) (✓)
+- [Atlas.Orm](https://github.com/atlasphp/Atlas.Orm) (✓)
+- [CakePHP ORM](https://github.com/cakephp/orm) (✓)
+- [RedBeanPHP](https://redbeanphp.com/index.php) (✓)
+- [Cycle ORM](https://github.com/cycle/orm) (✓)
+- [Propel](https://github.com/propelorm/Propel2) (✓)
+- [f3-cortex](https://github.com/ikkez/f3-cortex) (✓)
+- [~~nextras ORM~~](https://github.com/nextras/orm) - no [sqlite support](https://github.com/nextras/orm/issues/358)
+- [~~analogueorm~~](https://github.com/analogueorm/analogue) - not in active development since 2020-02-11 (yeaah, 5 days difference nah)
+- [~~paris~~](https://github.com/j4mie/paris) - not in active development since 2017-03-21
+- [~~spot2~~](https://github.com/spotorm/spot2) - not in active development since 2018-08-01
+- [~~Pomm~~](https://github.com/chanmix51/Pomm) - supports only postgres, not in active development since 2014-11-04
+- [~~VoodOrm~~](https://github.com/mardix/VoodOrm) - not in active development since 2014-05-05
 
 ### Clojure
 - [HugSQL](https://www.hugsql.org/) - Included because accidentally found it :)
