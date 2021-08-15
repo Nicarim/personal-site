@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>K3s for Home Server the Easy Way pt. 1 - SSO, external access, traefik | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="I&rsquo;ve always wanted to have my own home server. I&rsquo;ve even bought Intel NUC for that which I intended to use, but I never got around to configuring it properly so it has gathered dust while not in use.
+But in motivation strike, I decided to finally get around to do it, and implement it.
+Infra automation not always the best way to move forward First of all, I don&rsquo;t want to be it a maintanence burden at all.">
+    <meta name="generator" content="Hugo 0.87.0" />
+    
+    <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+  </head>
+
+  <body >
+    <div class="is-hidden-print">
+      <h2 class="title is-2 block has-text-centered mt-6"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    </div>
+    <main role="main" class="container pl-4 pr-4">
+      
+<section id="main">
+  <h1 class="title is-2">K3s for Home Server the Easy Way pt. 1 - SSO, external access, traefik</h1>
+  <div>
+        <article class="content has-text-justified">
+           <p>I&rsquo;ve always wanted to have my own home server. I&rsquo;ve even bought Intel NUC for that which I intended to use, but I never got around to configuring it properly so it has gathered dust while not in use.</p>
+<p>But in motivation strike, I decided to finally get around to do it, and implement it.</p>
+<h2 id="infra-automation-not-always-the-best-way-to-move-forward">Infra automation not always the best way to move forward</h2>
+<p>First of all, I don&rsquo;t want to be it a maintanence burden at all. With that comes also the need to be able to recover from possible hardware failure easily (and by that I mean all the configuration has to be available somewhere without much manual work).</p>
+<p>Initially, I wanted to use Ansible to just automate it, but then I realized that handling home server which I just want to be working it&rsquo;s too much overhead. I&rsquo;ve always got that feeling that if there is something trival I want to change in the server (like a value in config file) it made me anxious that I didn&rsquo;t use Ansible for that, because then I had to re-do that in Ansible, and if I forgot / didn&rsquo;t do it it would lead to configuration drift, making the Ansible useless&hellip; yeah, you understand why I&rsquo;m hesitant to using Ansible. Feedback loop for using Ansible for home server is just too big / complicated. If the changes were to be reflected immediately it maybe would be wise, but for a single server <a href="http://cloudscaling.com/blog/cloud-computing/the-history-of-pets-vs-cattle/">most-likely pet server</a>? nah.</p>
+<h2 id="using-complicated-monstrosity-for-less-complicated-setup">Using complicated monstrosity for less complicated setup</h2>
+<p>This might sound like paradox, but by using Kubernetes which is a <a href="https://phoenixnap.com/kb/understanding-kubernetes-architecture-diagrams">complex beast</a>, we can achieve simplicity thanks to its popularity. I&rsquo;ve came to the conclusion after years of reluctance to kubernetes that thanks to the fact it became defacto standard for container orchestration, everyone is working toward making it easier / better / more efficient to work with it. A lovely example of that is tool called <a href="https://github.com/derailed/k9s#screenshots">k9s</a> which became my Go-To tool for managing Kubernetes clusters.</p>
+<p>While plain docker setup has also such tools, like <a href="https://www.portainer.io/">Portainer</a>, I think it caters to different needs and portainer becomes platform-in-a-platform sort of tool and it doesn&rsquo;t make it easier to deploy things, merely makes it more GUI based.</p>
+<p>We also don&rsquo;t have to use K8s directly, there are distributions like <a href="https://k3s.io/">k3s</a> or <a href="https://k0sproject.io/">k0s</a> (I wonder what will be next - <code>k8-8s</code>?). The biggest difference between full-blown k8s, and distribution like k3s is that k3s bundles everything in a single binary, so we don&rsquo;t have to care about deploying / provisioning all of that. It provides sane defaults on how to manage it. While for production clusters it might be desirable to use k8s (never deployed it myself for production, always done using managed control plane solutions), k3s is mostly compatible with existing kubernetes supported projects which you will see later on in article.</p>
+<h2 id="requirements">Requirements</h2>
+<p>It&rsquo;s always good to know what do you want to achieve by the end of the day, and for me this is it:</p>
+<ul>
+<li><strong>Disaster Recovery</strong> - in case of a hardware failure causing full halt of our service we want to be able to recover easily.
+<ul>
+<li><a href="https://rancher.com/docs/k3s/latest/en/backup-restore/"><strong>k3s backup&amp;resotre</strong></a></li>
+<li><a href="https://restic.readthedocs.io/en/stable/"><strong>restic</strong></a> - encrypted backups for anything else</li>
+<li><a href="https://www.backblaze.com/b2/cloud-storage.html"><strong>b2</strong></a> - for storing the backups</li>
+</ul>
+</li>
+<li><a href="https://meme.fandom.com/wiki/Sanic_Hegehog?file=1385136139955.png"><strong>sanic</strong></a> <strong>feedback loop</strong> when it comes to adding / removing / changing things
+<ul>
+<li>Thinking between following solutions
+<ul>
+<li><a href="https://www.eclipse.org/che/"><strong>Eclipse Che</strong></a></li>
+<li><a href="https://www.gitpod.io/"><strong>gitpod</strong></a></li>
+<li><a href="https://github.com/cdr/code-server"><strong>code-server</strong></a></li>
+</ul>
+</li>
+<li>I want the IDE/Editor to be there always, independently of which device I use / where I am. And I want it to be preconfigured because each time I need to configure it on different device, my motivation to keep home server running drops significantly</li>
+</ul>
+</li>
+<li><strong>Secure external access</strong> - this is hard requirement for me.
+<ul>
+<li>While I could go through the hops of using wireguard to tunnel the traffic and make it invisible on the internet, not every piece of software supports that flow (like HomeAssistant), and having VPN connected all the times drains the battery. I&rsquo;m lazy, and I prefer things which don&rsquo;t require me thinking.</li>
+<li><a href="https://github.com/authelia/authelia"><strong>SSO Authelia</strong></a></li>
+<li><a href="https://github.com/greenpau/caddy-auth-portal"><strong>SSO caddy auth portal</strong></a></li>
+<li><a href="https://news.ycombinator.com/item?id=26409820"><strong>Alternatives mentioned on hacker news</strong></a></li>
+</ul>
+</li>
+<li><strong>My ISP&rsquo;s IP is hidden</strong>
+<ul>
+<li>I could expose everything through my IP, I&rsquo;ve IPv4 assigned and can port forward whatever I want, but I consider it to be a too big of security risk to expose myself to the internet like that. I might forgot to patch some zero day, or expose something without auth that allows <a href="https://blog.sqreen.com/remote-code-execution-rce-explained/">RCE</a></li>
+<li>Recently discovered <a href="https://github.com/fatedier/frp"><strong>frp (fast reverse proxy)</strong></a> which seems to be a perfect solution to my problem.</li>
+</ul>
+</li>
+<li><strong>Freedom</strong> and <strong>privacy</strong>
+<ul>
+<li>This comes as a result of doing it manually, but in the days of <a href="https://twitter.com/matthew_d_green/status/1423071186616000513">CSAM-like scanning</a> I think its important to start regaining full privacy to your content.</li>
+<li>It&rsquo;s not about having illegal stuff hidden from the cops (and I don&rsquo;t intend to hide anything like that [it&rsquo;s what people who do say, huh?]), its about their ability to be able to convict you based solely on the content you have. Now it&rsquo;s only CSAM scanning for clear purpose - but can you trust your authorities to not screw up by accident? Or by intention if you become political enemy? I can&rsquo;t.</li>
+<li>And also tracking and advertisments. I make pictures of reciepts that I take from shops - how do I know that cloud provider I use to store pictures doesn&rsquo;t scan them? I simply can&rsquo;t know that.</li>
+</ul>
+</li>
+</ul>
+<h2 id="external-access-architecture">External Access Architecture</h2>
+<p>This is what I did. It doesn&rsquo;t have to be the same for you. You might want to expose http of frp directly for example.</p>
+<figure><img src="http%20access%20diagram.svg"style=" max-height:500px;"
+    />
+</figure>
+<h2 id="provisioning-cluster">Provisioning cluster</h2>
+<p>For the cluster to be running and accepting external traffic several things need to be done. Read about them below.
+Quick summary of what will be done:</p>
+<ul>
+<li>Setting up HTTP frp server</li>
+<li>Setting up frp client and forwarding traffic to traefik</li>
+<li>Setting up SSO portal and accessing it from outside world</li>
+</ul>
+<p>Of course that is not everything I want to achieve with my home server - but that looks like a good baseline for everything else. I might create more articles based on that? Who knows.</p>
+<h3 id="setting-up-frp-server">Setting up frp server</h3>
+<p>We will be using frp server to be able to access our private addressed cluster from the outside world. We intend to only use http forwarding for now, but it can be expanded for https and more.</p>
+<p>Setting up the frp server is pretty straightforward. They provide you with <a href="https://github.com/fatedier/frp/releases">binary for all OSes</a>.
+As I use external shell provider which shares single IP across multiple accounts, I had to reserve the specific port that I&rsquo;ll be using for gainig external access.
+They also have shared http/https server, which allows reverse_proxy functionality. What I did was:</p>
+<ul>
+<li>Download the frp compressed package for freeBSD (provider&rsquo;s OS)</li>
+<li>Run new screen session using <code>screen -S frp_server</code> command</li>
+<li>Create new directory for <code>mkdir ~/frps</code></li>
+<li>Create configuration file <code>frps.ini</code></li>
+</ul>
+<p>My configuration file for <code>frp server</code> has following configuration:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ini" data-lang="ini"><span style="color:#66d9ef">[common]</span>
+<span style="color:#a6e22e">bind_addr</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;external_ip&gt;</span>
+<span style="color:#a6e22e">bind_port</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;port_for_frp_server&gt;</span>
+
+<span style="color:#a6e22e">kcp_bind_port</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;port_for_frp_server&gt;</span>
+
+<span style="color:#a6e22e">vhost_http_port</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;port_for_frp_server&gt;</span>
+<span style="color:#a6e22e">vhost_https_port</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;port_for_frp_server&gt;</span>
+
+<span style="color:#a6e22e">log_file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;home_dir&gt;/frps/frps.log</span>
+
+<span style="color:#a6e22e">log_max_days</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">7</span>
+<span style="color:#a6e22e">log_level</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">info</span>
+
+<span style="color:#a6e22e">authentication_method</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">token</span>
+
+<span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;your_custom_token&gt;</span>
+
+<span style="color:#a6e22e">allow_ports</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;port for services other than http, can be left same as bind_port&gt;</span>
+</code></pre></div><p>Great thing about frp is that it&rsquo;s smart. It&rsquo;s smart to the point that it knows the difference between tunneling traffic and user traffic.
+Thanks to that, it allows you to utilize single port for all the functionality required for forwarding http.
+As I only had a single port reserved on shared hosting, it was great for that purpose.</p>
+<p>To run the frp server in the background, I simply run <code>./frps -c frps.ini</code> and leave the screen session with key combination <code>ctrl + a | d</code> (that means <code>ctrl + a</code> keys and then <code>d</code> key)</p>
+<p>For going back to frp session you can <code>screen -r frp_server</code></p>
+<h4 id="setting-up-reverse-proxy-for-frp">Setting up reverse proxy for frp</h4>
+<p>Because I used shell provider, they&rsquo;ve had a nice propertiary GUI for setting up the reverse proxy. Equivalent of that setup would be something along this in <code>nginx</code> (assuming nginx and frp are running on the same host).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nginx" data-lang="nginx">  <span style="color:#66d9ef">server</span> { <span style="color:#75715e"># simple reverse-proxy
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">listen</span>  <span style="color:#ae81ff">80</span>;
+    <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">frp.your_domain.com</span>;
+
+    <span style="color:#f92672">location</span> <span style="color:#e6db74">/</span> {
+      <span style="color:#f92672">proxy_pass</span>      <span style="color:#e6db74">http://127.0.0.1:&lt;port_for_frp_server&gt;</span>;
+    }
+  }
+</code></pre></div><p>I&rsquo;m using <code>frp.your_domain.com</code> for matching the virtual host through whole guide.</p>
+<p>Although, <strong>if you use VPS provider</strong>, you should just directly expose the frp proxy on http and https ports by specyfing <code>vhost_http_port</code> and <code>vhost_https_port</code> as respectively 80 and 443 ports.
+You might also need to run frp as <code>root</code> in that case (using <code>sudo ./frps -c frps.ini</code> for example) since ports 80 and 443 are only allowed for elevated access.</p>
+<h4 id="important-setting-up-ssl-endpoint">Important: Setting up SSL endpoint</h4>
+<p>Although not covered here, after I&rsquo;ve added reverse proxy I&rsquo;ve also set-up https access to the server.
+It is hard requirement for anything that reasembles secure environment. For <code>nginx</code> reverse proxy setup, setting up let&rsquo;s encrypt seems to be the best way.
+I didn&rsquo;t cover (and done yet) encrypted traffic between <code>frp</code> server and client - but that will come later.</p>
+<p>For pain-free SSL, you can use <a href="https://certbot.eff.org/">Certbot</a>.
+There is also <a href="https://www.cloudflare.com/">cloudflare</a> which acts as a reverse proxy too and provides SSL out of the box.</p>
+<h3 id="setting-up-k3s-on-the-home-server">Setting up k3s on the home server</h3>
+<p>I&rsquo;m assuming you&rsquo;ve got the server up and running, configured in your network with private static IP, and that machine has full access to the internet. I personally used Ubuntu 20.04 OS.</p>
+<p>To install k3s on that server, all you have to do is run <a href="https://k3s.io/">commands on the k3s site</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -sfL https://get.k3s.io | sh -
+<span style="color:#75715e"># Check for Ready node,</span>
+takes maybe <span style="color:#ae81ff">30</span> seconds
+k3s kubectl get node
+</code></pre></div><p>! Warning - always check the content of the shell scripts you&rsquo;re running. Never run untrusted shell scripts directly from the internet.</p>
+<p>If you&rsquo;ve got it right you should see single node output in <code>k3s kubectl get node</code> command. That means it&rsquo;s all working and ready to use.</p>
+<h3 id="accessing-your-k3s-from-outside-the-machine-but-inside-the-network">Accessing your k3s from outside the machine (but inside the network)</h3>
+<p>I&rsquo;m assuming you&rsquo;re using a machine that is in the same network that your home server is.</p>
+<p>Doing everything on the server itself can be tedious so we will use external access to kubernetes cluster.
+For that we need to copy a file that was created by k3s in <code>/etc/rancher/k3s/k3s.yaml</code>. For that we can simply do <code>scp &lt;user&gt;@&lt;server&gt;:/etc/rancher/k3s/k3s.yaml .</code> and that will copy the file onto your local machine.</p>
+<p>You also need to change one line in it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://127.0.0.1:6443</span>
+</code></pre></div><p>This needs to be changed to IP address of your home server, in my case it&rsquo;s <code>10.5.10.5</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://10.5.10.5:6443</span>
+</code></pre></div><p>Change it like so, and save the file.</p>
+<p>Now you have to install <code>kubectl</code>, just <a href="https://kubernetes.io/docs/tasks/tools/">follow the official guide for your OS</a>. In case of arch linux / manjaro, I used <code>yay kubectl</code> and installed the available package.</p>
+<p>After you get kubectl installed, all that is left to do is to replace your <code>~/.kube/config</code> file with the one you just downloaded from your server. Simply run <code>cp &lt;path_to_k3s.yaml&gt; ~/.kube/config</code>, in case the directory doesn&rsquo;t exist create it using <code>mkdir ~/.kube</code>.</p>
+<p>Now you should see the same output when running <code>kubectl get nodes</code> on your PC.</p>
+<pre><code>NAME             STATUS   ROLES                  AGE   VERSION
+intel-nuc        Ready    control-plane,master   21h   v1.21.3+k3s1
+</code></pre><h3 id="adding-frp-client-to-the-cluster">Adding frp client to the cluster</h3>
+<p>As we&rsquo;ve got frp up and running, accessing the frp endpoint should yield following output:
+<figure><img src="frps-output-unconfigured.png"style=""
+    />
+</figure></p>
+<p>That means nothing is yet connected to frp and it is just serving the default page. That also means it&rsquo;s working correctly.</p>
+<p>For setting up frp server in the cluster, I created following k8s manifest <code>frpc.yaml</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Namespace</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frp</span>
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Secret</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frpc-config</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">frp</span>
+<span style="color:#f92672">stringData</span>:
+  <span style="color:#f92672">frpc.ini</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [common]
+</span><span style="color:#e6db74">    server_addr = &lt;frps_ip_or_domain&gt;
+</span><span style="color:#e6db74">    server_port = &lt;frps_port&gt;
+</span><span style="color:#e6db74">    token = &lt;your_custom_token&gt;
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    [web01]
+</span><span style="color:#e6db74">    type = http
+</span><span style="color:#e6db74">    local_ip = traefik.kube-system.svc
+</span><span style="color:#e6db74">    local_port = 80
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    custom_domains = frp.your_domain.com
+</span><span style="color:#e6db74">    header_X-Forwarded-Proto = https</span>    
+---
+<span style="color:#75715e"># header_X-Forwarded-Proto assumes that you&#39;re redirecting http traffic to https, so that the access is always through SSL.</span>
+<span style="color:#75715e"># If that is not the case, remove the line. But it won&#39;t work with SSO presented later.</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frpc</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">frp</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">frpc</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">frpc</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">frpc</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frpc</span>
+          <span style="color:#f92672">image</span>: <span style="color:#ae81ff">snowdreamtech/frpc:0.37.0</span>
+          <span style="color:#f92672">volumeMounts</span>:
+            - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config</span>
+              <span style="color:#f92672">mountPath</span>: <span style="color:#e6db74">&#34;/etc/frp&#34;</span>
+              <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">true</span>
+      <span style="color:#f92672">volumes</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config</span>
+          <span style="color:#f92672">secret</span>:
+            <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">frpc-config</span>
+</code></pre></div><p>If you create <code>frpc.yaml</code> file and paste the manifest in it, you should be able to run <code>kubectl apply -f frpc.yaml</code> to get <code>frp</code> client up and running.</p>
+<p>After that, you should see <code>traefik</code> error when accessing <code>frp.your_domain.com</code> domain.</p>
+<p><code>404 page not found</code></p>
+<p>That means <code>frp</code> works correctly and that you&rsquo;re able to access it from the outside.</p>
+<h4 id="storing-k8s-manifests-in-git">Storing k8s manifests in git</h4>
+<p>A nice feature of kubernetes manifests is that you can store them in git repository.
+That means when next time you want to setup a new cluster, or recreate existing one, all you have to do is to just reapply the manifests you stored in git.
+That is one of the things that make <strong>Disaster Recovery</strong> faster. You don&rsquo;t have to recreate the setup yourself, you just apply what you already have/had.
+This will be even more powerful later on.</p>
+<h2 id="authelia-for-sso-portal">Authelia for SSO portal</h2>
+<p>After we got <code>traefik</code> access up and running, next step for us is to setup <a href="https://github.com/authelia/authelia"><strong>Authelia</strong></a>.
+I chose that project, even though it&rsquo;s not yet fully-featured (like <code>Caddy</code>&rsquo;s counterpart) simply due to documented (somehow) way to make it work with <code>traefik</code> (which is built-in to k3s).
+I&rsquo;ll be deploying login portal on <code>/ssoauth</code> endpoint. <strong>Sadly authelia <a href="https://www.authelia.com/docs/configuration/server.html#path">doesn&rsquo;t support</a> multi-level subpaths or dashes</strong></p>
+<h3 id="authelia-deployment-manifest">Authelia deployment manifest</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Namespace</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia</span>
+
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Secret</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-config</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">authelia</span>
+<span style="color:#f92672">stringData</span>:
+  <span style="color:#f92672">configuration.yml</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    jwt_secret: &lt;your secret&gt;
+</span><span style="color:#e6db74">    server:
+</span><span style="color:#e6db74">      host: 0.0.0.0
+</span><span style="color:#e6db74">      port: 9091
+</span><span style="color:#e6db74">      path: &#34;ssoauth&#34;
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    log:
+</span><span style="color:#e6db74">      level: debug
+</span><span style="color:#e6db74">    authentication_backend:
+</span><span style="color:#e6db74">      file:
+</span><span style="color:#e6db74">        path: /config/users_database.yml
+</span><span style="color:#e6db74">    access_control:
+</span><span style="color:#e6db74">      default_policy: deny
+</span><span style="color:#e6db74">      rules:
+</span><span style="color:#e6db74">        - domain: frp.your_domain.com
+</span><span style="color:#e6db74">          policy: one_factor
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    session:
+</span><span style="color:#e6db74">      name: authelia_session
+</span><span style="color:#e6db74">      # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
+</span><span style="color:#e6db74">      secret: unsecure_session_secreta
+</span><span style="color:#e6db74">      expiration: 3600  # 1 hour
+</span><span style="color:#e6db74">      inactivity: 300  # 5 minutes
+</span><span style="color:#e6db74">      domain: frp.your_domain.com  # Should match whatever your root protected domain is
+</span><span style="color:#e6db74">    # TODO: make this on PVC and backup it
+</span><span style="color:#e6db74">    storage:
+</span><span style="color:#e6db74">      local:
+</span><span style="color:#e6db74">        path: /tmp/db.sqlite3
+</span><span style="color:#e6db74">    notifier:
+</span><span style="color:#e6db74">      disable_startup_check: false
+</span><span style="color:#e6db74">      filesystem:
+</span><span style="color:#e6db74">        filename: /tmp/notification.txt</span>    
+  <span style="color:#f92672">users_database.yml</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    users:
+</span><span style="color:#e6db74">      your_user:
+</span><span style="color:#e6db74">        displayname: &#34;Your name&#34;
+</span><span style="color:#e6db74">        password: &#34;$argon2id$yourhash&#34;
+</span><span style="color:#e6db74">        email: your@email.com
+</span><span style="color:#e6db74">        groups:
+</span><span style="color:#e6db74">          - admins</span>    
+<span style="color:#75715e"># For password hash generation use https://argon2.online/</span>
+<span style="color:#75715e"># Choose params:</span>
+<span style="color:#75715e"># type: `argon2id`</span>
+<span style="color:#75715e"># Memory cost: `128`</span>
+<span style="color:#75715e"># hash length: `32`</span>
+<span style="color:#75715e"># parallelism: `8`</span>
+<span style="color:#75715e"># iterations: `2` </span>
+<span style="color:#75715e"># Mount files that are going to be modified by authelia in /tmp instead of /config default path</span>
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-server</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">authelia</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">authelia-server</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">authelia-server</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">authelia-server</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">enableServiceLinks</span>: <span style="color:#66d9ef">false</span>
+      <span style="color:#f92672">containers</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-server</span>
+          <span style="color:#f92672">image</span>: <span style="color:#ae81ff">authelia/authelia:4.30.4</span>
+          <span style="color:#f92672">volumeMounts</span>:
+            - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config</span>
+              <span style="color:#f92672">mountPath</span>: <span style="color:#e6db74">&#34;/config&#34;</span>
+              <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">false</span>
+          <span style="color:#f92672">ports</span>:
+            - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">9091</span>
+              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+      <span style="color:#f92672">volumes</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config</span>
+          <span style="color:#f92672">secret</span>:
+            <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">authelia-config</span>
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-server</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">authelia</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-server</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">ports</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">9091</span>
+    <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+    <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">9091</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">authelia-server</span>
+</code></pre></div><p>Important things about this:</p>
+<ul>
+<li>We&rsquo;re specyfing authelia to listen on 9091 port. And we&rsquo;re also exposing the service for that port so we can access it from outside world later on.</li>
+<li>Access control config that I provided is just for presentation purposes, adjust it according to your own needs and consult the manual.</li>
+<li>Anything that is writeable by authelia (like sqlite or mailer config) needs to be in writable place (like <code>/tmp</code>)</li>
+<li>You need to generate JWT secret and your user&rsquo;s password best using <code>argon2</code>. Authelia supports having different / dynamic backends for that like postgreSQL or MySQL. But for testing purposes and or home use I think this is generally fine as is.</li>
+<li>You may want to configure 2fa using solution like <a href="https://www.authelia.com/docs/configuration/one-time-password.html">OTP tokens</a>.</li>
+</ul>
+<h3 id="applying-authelia-manifest">Applying authelia manifest</h3>
+<p>Save the content of this snippet to <code>authelia.yaml</code> file, and apply it using <code>kubectl apply -f authelia.yaml</code></p>
+<h4 id="special-case-for-no-https-behind-reverse-proxy">Special case for no https behind reverse proxy</h4>
+<p>Because I used the reverse proxy setup where termination of SSL happens on the public IP provider (my shell box in that case),
+I had to trust X-Forwarded-* headers in traefik config. Sadly because of the fact that traefik is bundled and preconfigured you have to provide special config on the server.
+It is documented in <a href="https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig">official k3s docs</a>, and they even specify that specific example.
+Without that you will be getting <code>Unauthorized</code> with following error:</p>
+<pre><code>Scheme of target URL http://frp.your_domain.com/ must be secure since cookies are only transported over a secure connection for security reasons
+</code></pre><p>Even though that your public endpoint is secured.</p>
+<h5 id="quick-fix-for-trusting-forwarded-headers">Quick fix for trusting forwarded headers</h5>
+<p>Even quickier method, although probably needs to be reapplied every time is to just add <code>- --entryPoints.web.forwardedHeaders.insecure</code> at the end of traefik deployment specification at</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">  <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">args</span>:
+        <span style="color:#ae81ff">(...)</span>
+        - --<span style="color:#ae81ff">entryPoints.web.forwardedHeaders.insecure</span>
+</code></pre></div><h3 id="adding-ingress-for-accessing-authelia-endpoint">Adding ingress for accessing authelia endpoint</h3>
+<p>After we got the authelia deployment done, we still need to tell <code>traefik</code> on how can we even access authelia.
+In recent kubernetes and traefik versions you can use <code>Ingress</code> directly to achieve that.
+(I&rsquo;m saying that because previously you would have to use annotations for that and they can get really ugly)</p>
+<p>For the ingress object, it can be as simple as that:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">networking.k8s.io/v1</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-web</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">authelia</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">rules</span>:
+    - <span style="color:#f92672">host</span>: <span style="color:#ae81ff">frp.your_domain.com</span>
+      <span style="color:#f92672">http</span>:
+        <span style="color:#f92672">paths</span>:
+          - <span style="color:#f92672">pathType</span>: <span style="color:#ae81ff">Prefix</span>
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/ssoauth</span>
+            <span style="color:#f92672">backend</span>:
+              <span style="color:#f92672">service</span>:
+                <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-server</span>
+                <span style="color:#f92672">port</span>:
+                  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+</code></pre></div><p>What it does is that it exposes the authelia server endpoint on <code>/ssoauth</code> sub path, just like we specified in authelia config.
+We need to expose authelia in one way or another because that is where you will be doing the log-in.</p>
+<h3 id="applying-ingress-manifest">Applying ingress manifest</h3>
+<p>Save that to <code>authelia-ingress.yaml</code> and apply using <code>kubectl apply -f authelia-ingress.yaml</code></p>
+<h3 id="testing-if-everything-works">Testing if everything works</h3>
+<p>We should now be able to access <a href="https://frp.your_domain.com/ssoauth/">https://frp.your_domain.com/ssoauth/</a> and see our login page.</p>
+<figure><img src="authelia-login-screen.png"style=""
+    />
+</figure>
+<h2 id="making-service-accessable-through-sso">Making service accessable through SSO</h2>
+<p>If we got authelia setup right, we should now be at the state where:</p>
+<ul>
+<li>We have external access on <a href="https://frp.your_domain.com">https://frp.your_domain.com</a></li>
+<li>We have authelia portal on <a href="https://frp.your_domain.com/ssoauth/">https://frp.your_domain.com/ssoauth/</a></li>
+</ul>
+<p>One last bit is to now create a service which will be hosted on our server and accessable through auth portal.</p>
+<h3 id="creating-forwardauth-middleware">Creating forwardAuth middleware</h3>
+<p><code>traefik</code> has a concept of <a href="https://doc.traefik.io/traefik/middlewares/forwardauth/">forward auth middleware</a>.
+Image on their site nicely explains the concept.</p>
+<p>In short what it does is that it asks external service if we should have access to target service, and if the service says OK authorized, it allows traffic.
+If not, it will redirect for authorization and then let the traffic.</p>
+<p>Principle is pretty simple, and so is the implementation</p>
+<h3 id="middleware-manifest">Middleware manifest</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Middleware</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-auth</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">authelia</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">forwardAuth</span>:
+    <span style="color:#f92672">address</span>: <span style="color:#ae81ff">http://authelia-server.authelia.svc:9091/api/verify?rd=https://frp.your_domain.com/ssoauth/</span>
+    <span style="color:#f92672">trustForwardHeader</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">authResponseHeaders</span>:
+      - <span style="color:#ae81ff">Remote-User</span>
+      - <span style="color:#ae81ff">Remote-Group</span>
+      - <span style="color:#ae81ff">Remote-Email</span>
+</code></pre></div><p>Let me explain here what happened:</p>
+<ul>
+<li>We use <a href="https://doc.traefik.io/traefik/middlewares/forwardauth/#configuration-examples">Middleware Custom Resource Definition</a> (CRD) for setting up middleware object.</li>
+<li>We point it to use <code>authelia-server</code> service in <code>authelia</code> namespace. Syntax for addressing services is <code>&lt;service_name&gt;.&lt;service_namespace&gt;.svc</code>. We could omit the <code>service_namespace</code> because we create middleware in the same namespace, but it is always better to be explicit in that IMO.</li>
+<li>Authelia after authorization will add <code>Remote-*</code> <a href="https://www.authelia.com/docs/deployment/supported-proxies/#how-can-the-backend-be-aware-of-the-authenticated-users">headers</a>, we&rsquo;re choosing to add them to the final request so the server can utlizie them if it <a href="https://www.authelia.com/docs/community/using-remote-user-header-for-sso-with-jira.html">supports authorization through headers</a> for example.</li>
+<li>Endpoint for checking authorization is <code>/api/verify</code> and it accepts parameter called <code>rd</code> for telling it where to redirect if authorization isn&rsquo;t there.</li>
+</ul>
+<p>We need to apply the manifest as always.</p>
+<h3 id="configuring-our-service-to-use-forwardauth-middleware">Configuring our service to use forwardAuth middleware</h3>
+<p>If we got some service running in our k3s cluster, for example popular testing container <code>whoami</code>
+I used <a href="https://medium.com/@geraldcroes/kubernetes-traefik-101-when-simplicity-matters-957eeede2cf8">this guide</a> to deploy the whoami <code>Deployment</code> and <code>Service</code>
+Assuming you&rsquo;ve done the same here is how to make it use our middleware.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">networking.k8s.io/v1</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">whoami</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">default</span>
+  <span style="color:#f92672">annotations</span>:
+    <span style="color:#f92672">traefik.ingress.kubernetes.io/router.middlewares</span>: <span style="color:#e6db74">&#34;authelia-authelia-auth@kubernetescrd&#34;</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">rules</span>:
+    - <span style="color:#f92672">host</span>: <span style="color:#ae81ff">frp.your_domain.com</span>
+      <span style="color:#f92672">http</span>:
+        <span style="color:#f92672">paths</span>:
+          - <span style="color:#f92672">pathType</span>: <span style="color:#ae81ff">Prefix</span>
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/</span>
+            <span style="color:#f92672">backend</span>:
+              <span style="color:#f92672">service</span>:
+                <span style="color:#f92672">name</span>: <span style="color:#ae81ff">whoami-service</span>
+                <span style="color:#f92672">port</span>:
+                  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+</code></pre></div><p>The most important thing here is <code>traefik.ingress.kubernetes.io/router.middlewares: &quot;authelia-authelia-auth@kubernetescrd&quot;</code>.
+Syntax for specyfing middleware:</p>
+<pre><code>&lt;namespace&gt;-&lt;middleware_name&gt;@kubernetescrd
+</code></pre><ul>
+<li><!-- raw HTML omitted --> - means the namespace where middleware was defined, in our case it is <code>namespace: authelia</code></li>
+<li>&lt;middleware_name&gt; - means the name of middleware as specified in manifest, in our case it is <code>name: authelia-auth</code></li>
+</ul>
+<p>The rest of manifest just tells to host <code>whoami-service</code> on <code>/</code> path. that will be <code>frp.your_domain.com</code>.</p>
+<p>Apply the manifest.</p>
+<h2 id="checking-if-our-sso-setup-works">Checking if our SSO setup works</h2>
+<p>Now if you followed the guide, and the guide is correct (assuming I didn&rsquo;t forgot any detail), accessing <code>https://frp.your_domain.com/</code> should redirect you to <code>https://frp.your_domain.com/ssoauth/</code> where
+after logging in you should be able to see the response of whoami service.</p>
+<h2 id="wrapping-it-up">Wrapping it up</h2>
+<p>Definitely this is not a finished setup, but I hope this is a good base setup for making your services gated through SSO.
+If there are any mistakes in the article, or missing information, or something is wrong, please reach out to me.
+I tried my best to include all the necessary details to replicate what I&rsquo;ve done</p>
+<p>What is left here:</p>
+<ul>
+<li>Secure the connection between <code>frp</code> client and server</li>
+<li>Deploy some meaningful service onto <code>k3s</code></li>
+<li>Make that service SSO aware (so that you don&rsquo;t need to go through dual auth hop).</li>
+<li>Make deployments automatic</li>
+<li>Create personal cloud for editing and configuring <code>k3s</code> from within (using previously mentioned <code>gitpod</code> like solutions)</li>
+<li>Create backups and test disaster recovery.</li>
+<li>Making a cluster? Currently using <code>k3s</code> in single node setup</li>
+</ul>
+<p>I hope that will come later if my motivation allows me :)</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
