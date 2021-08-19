@@ -6,7 +6,17 @@
     <description>Recent content in Blog on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 14 Aug 2021 09:30:13 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 19 Aug 2021 15:17:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Flashing Android 7 onto Lenovo A3500-FL (Custom ROM, Recovery)</title>
+      <link>https://flicksfix.com/posts/flashing-android-7-lenovo-a3500-fl/</link>
+      <pubDate>Thu, 19 Aug 2021 15:17:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/flashing-android-7-lenovo-a3500-fl/</guid>
+      <description>Long time ago I bought a tablet Lenovo A3500-FL. It&amp;rsquo;s really old tablet but still works suprisingly well. I thought about maybe having it working as a mobile terminal or Home Assistant Dashboard.
+It only has offical upgrade to Android 4.4.2 which is really old and applications might not be targeting it anymore. According to XDA article only 4% of devices are still running Android that old (and 5,9% culminative of previous versions and this one).</description>
+    </item>
+    
     <item>
       <title>K3s for Home Server the Easy Way pt. 1 - SSO, external access, traefik</title>
       <link>https://flicksfix.com/posts/k3s-for-home-server-the-easy-way-pt-1/</link>
