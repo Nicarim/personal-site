@@ -4,6 +4,11 @@ title = "Writing about code, electronics and other stuff"
 theme = "custom-theme"
 sectionPagesMenu = "main"
 
+[sitemap]
+changefreq = 'monthly'
+filename = 'sitemap.xml'
+priority = 0.5
+
 # [menu]
 #     [[menu.main]]
 #         identifier = "about"

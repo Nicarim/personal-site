@@ -3,68 +3,119 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://flicksfix.com/about/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/</loc>
-    <lastmod>2021-08-19T15:17:00+02:00</lastmod>
+    <lastmod>2021-09-01T17:07:44+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/</loc>
     <lastmod>2020-12-30T00:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/contact/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://flicksfix.com/posts/understanding-flannel-networking-in-k3s/</loc>
+    <lastmod>2021-09-01T17:07:44+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://flicksfix.com/</loc>
+    <lastmod>2021-09-01T17:07:44+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/flashing-android-7-lenovo-a3500-fl/</loc>
     <lastmod>2021-08-19T15:17:00+02:00</lastmod>
-  </url><url>
-    <loc>https://flicksfix.com/</loc>
-    <lastmod>2021-08-19T15:17:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/k3s-for-home-server-the-easy-way-pt-1/</loc>
     <lastmod>2021-08-14T09:30:13+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/living-in-the-ide/</loc>
     <lastmod>2021-08-05T17:07:59+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/infra-as-a-code-is-cloud-lock-in/</loc>
     <lastmod>2021-08-04T20:23:53+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/no-idea-where-to-live/</loc>
     <lastmod>2021-08-04T13:38:41+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/tfui/</loc>
     <lastmod>2020-12-30T00:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/esp32-pwm-driver-prototype/</loc>
     <lastmod>2020-11-14T10:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/gemrabot/</loc>
     <lastmod>2020-08-29T00:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/threedverse/</loc>
     <lastmod>2020-06-12T00:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/hash-sum-mismatch-virtualbox/</loc>
     <lastmod>2020-05-20T10:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/paperless-fork/</loc>
     <lastmod>2020-02-15T10:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/docker-swarm-cluster/</loc>
     <lastmod>2020-01-06T10:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/scooter-board-mcu/</loc>
     <lastmod>2019-10-29T00:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/langenv/</loc>
     <lastmod>2018-08-05T17:50:17+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/arduino-visualizer/</loc>
     <lastmod>2015-05-09T09:40:23+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/projects/trellobot/</loc>
     <lastmod>2014-04-18T09:23:30+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/categories/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/tags/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>

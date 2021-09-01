@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Understanding Flannel Networking in K3s | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="How does it work without Flannel Assumption: I&rsquo;m using host networking through these examples. You could utilize docker network for example, but to make it simple I wanted to stick to the fact below
+container network = host/node network
+If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to
+Like so:
+#1 Node 10.0.0.10
+ #1 Server Container binds onto port 5432 #2 Client Container connects to 127.">
+    <meta name="generator" content="Hugo 0.87.0" />
+    
+    <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+  </head>
+
+  <body >
+    <div class="is-hidden-print">
+      <h2 class="title is-2 block has-text-centered mt-6"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    </div>
+    <main role="main" class="container pl-4 pr-4">
+      
+<section id="main">
+  <h1 class="title is-2">Understanding Flannel Networking in K3s</h1>
+  <div>
+        <article class="content has-text-justified">
+           <h2 id="how-does-it-work-without-flannel">How does it work without Flannel</h2>
+<p><strong>Assumption: I&rsquo;m using host networking through these examples. You could utilize docker network for example, but to make it simple I wanted to stick to the fact below</strong></p>
+<p><code>container network = host/node network</code></p>
+<p>If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to</p>
+<p>Like so:</p>
+<p>#1 Node 10.0.0.10</p>
+<ul>
+<li>#1 Server Container binds onto port 5432</li>
+<li>#2 Client Container connects to 127.0.0.1:5432 (Orange connection)</li>
+</ul>
+<p>#2 Node 10.0.0.11</p>
+<ul>
+<li>#1 Client Container connects to 10.0.0.10:5432 (Blue Connection)</li>
+</ul>
+<figure><img src="withoutflannel-2021-08-29-1706%281%29.png"style=""
+    />
+</figure>
+<p>It&rsquo;s a problem because you have limited amount of ports available for specific interface, and also that you cannot use the same port twice so you would need to keep track of the ports that are used on each node.</p>
+<p>You&rsquo;re also exposing these services to the local area network and this is something we may not want to do.</p>
+<h2 id="how-to-solve-it-without-flannel">How to solve it without Flannel</h2>
+<p>General idea would be to have all containers bind to arbitrary localhost address, and have a tunnel established between nodes. It is possible thanks to the fact we have whole 127.0.0.0/8 address space available (Per RFC 5735)</p>
+<p>For example:</p>
+<figure><img src="withoutflannelwithtunnel-2021-08-29-1706.png"style=""
+    />
+</figure>
+<p>#1 Node 10.0.0.10</p>
+<ul>
+<li>#1 Server Container binds onto port 127.0.0.99:5432</li>
+<li>#2 Tunnel container that accepts connection on 10.0.0.10:9090 and redirects that traffic onto 127.0.0.99:5432</li>
+<li>#3 Client container connects to 127.0.0.99:5432</li>
+</ul>
+<p>#2 Node 10.0.0.11</p>
+<ul>
+<li>#1 Tunnel Container that connects to 10.0.0.10:9090 and exposes connection on 127.0.0.99:5432</li>
+<li>#2 Client container connects to 127.0.0.10:5432</li>
+</ul>
+<p>What did we solve here?</p>
+<ul>
+<li>Now we don&rsquo;t bind the container directly to the public facing interface, but instead we create a tunnel</li>
+<li>Assuming the tunnel is created using some kind of Shared Key Encryption, no one will be able to connect / read the traffic unless they have the key too.</li>
+<li>We can bind now arbitrary number of :5432 ports up to 16 milion containers (more than enough)</li>
+</ul>
+<p>What problems do we have still?</p>
+<ul>
+<li>We need to create tunnel for each new server
+<ul>
+<li>We could&rsquo;ve used some kind of smart tunnel (and such solutions exist!) but we&rsquo;re assuming our tunnel is dumb and just forwards traffic</li>
+</ul>
+</li>
+<li>We have to handle secrets for each connection to occur</li>
+<li>If we had more than one node we would need to setup the tunnel between each node if on every node we have a client</li>
+<li>That&rsquo;s pretty inefficient</li>
+</ul>
+<p>(Btw concept I just explained is the core idea behind so-called Service Mesh, but this is no way explanation for it)</p>
+<h2 id="how-flannel-solve-the-problem">How flannel solve the problem</h2>
+<p>Flannel in its default configuration uses so called VXLAN. It setups a one-to-many network on a single port <code>8472</code> (IANA specifies that port to be <code>4789</code>) with routing achieved thanks to Linux built in support for VXLAN.</p>
+<h3 id="testing-out-in-k3d">Testing out in k3d</h3>
+<p>I&rsquo;ve used k3d to create testing k3s setup using</p>
+<pre><code class="language-properties" data-lang="properties">k3d cluster create flannel-testing 
+</code></pre><p>This creates a cluster with a single node.</p>
+<p>Now we can check how is flannel configured on the single node setup. To SSH into the node I use <code>k9s</code> with <code>node-shell</code> <a href="https://github.com/derailed/k9s#node-shell">configured</a>. Thanks to that I can create shell instance on any node I want and see node&rsquo;s configuration.</p>
+<pre><code class="language-properties" data-lang="properties">/ # ip route
+default via 172.18.0.1 dev eth0 
+10.42.0.0/24 dev cni0 scope link  src 10.42.0.1 
+172.18.0.0/16 dev eth0 scope link  src 172.18.0.2
+</code></pre><p>We can see two interfaces - one for <code>eth0</code> and one for <code>cni0</code>.</p>
+<p>Because k3d stands for <code>K3s in Docker</code> we can examine where each interface comes from.</p>
+<p><code>eth0</code> can be seen in output of <code>docker network ls</code></p>
+<pre><code class="language-properties" data-lang="properties">&gt; docker network ls
+80e3c272a268   k3d-flannel-testing   bridge    local
+</code></pre><p>To see what CIDR it uses we can inspect it using <code>docker network inspect 80e3c272a268</code></p>
+<pre><code class="language-properties" data-lang="properties">&gt; docker network inspect 80e3c272a268
+[...]
+&quot;IPAM&quot;: {
+	&quot;Driver&quot;: &quot;default&quot;,
+	&quot;Options&quot;: null,
+	&quot;Config&quot;: [
+		{
+			&quot;Subnet&quot;: &quot;172.18.0.0/16&quot;,
+			&quot;Gateway&quot;: &quot;172.18.0.1&quot;
+		}
+	]
+},
+</code></pre><p>And this is where <code>eth0</code> comes from. But where is <code>cni0</code> defined?</p>
+<p>I&rsquo;d like to find out about it not because I know it&rsquo;s flannel, but using OS native tooling so this is universal advice.</p>
+<p>Turns out it&rsquo;s not really easy when using <code>busybox</code> image as it doesn&rsquo;t provide necessary information in <code>ip</code> outputs (doesn&rsquo;t support <code>-details</code> flag for example). So I need to use different image for that.</p>
+<p>So I replaced <code>busybox</code> with <a href="https://hub.docker.com/r/nicolaka/netshoot">nicolaka/netshoot</a>.</p>
+<p>Now we can check what is <code>cni0</code> by typing out</p>
+<pre><code class="language-properties" data-lang="properties">&gt; ip -details link show cni0
+cni0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether b6:a5:7e:f6:17:25 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535
+	bridge forward_delay [...]
+</code></pre><p>It turns out <code>cni0</code> is not a VXLAN interface? Where is our vxlan interface?</p>
+<pre><code class="language-properties" data-lang="properties">&gt; ip link show
+1: lo: [..]
+2: flannel.1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default 
+    link/ether 12:c0:9a:88:11:82 brd ff:ff:ff:ff:ff:ff
+3: cni0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether b6:a5:7e:f6:17:25 brd ff:ff:ff:ff:ff:ff
+5: vethf2772684@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
+    link/ether 42:c1:fd:fe:42:e5 brd ff:ff:ff:ff:ff:ff link-netnsid 2
+7: vethf314b245@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
+    link/ether 52:2b:6e:1b:66:61 brd ff:ff:ff:ff:ff:ff link-netnsid 4
+8: veth2cd71447@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
+    link/ether d2:e1:b3:06:8a:ed brd ff:ff:ff:ff:ff:ff link-netnsid 5
+9: eth0@if10: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+10: veth86f7911b@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
+    link/ether be:4e:7b:f5:8c:12 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+11: vethd2d58b32@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
+    link/ether f6:2a:73:93:e9:ca brd ff:ff:ff:ff:ff:ff link-netnsid 6
+</code></pre><p>There are plenty of interfaces! We can probably guess now which do we want to check next.</p>
+<pre><code class="language-properties" data-lang="properties">&gt; ip -details link show flannel.1
+2: flannel.1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default 
+    link/ether 12:c0:9a:88:11:82 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535 
+    vxlan id 1 local 172.18.0.2 dev eth0 srcport 0 0 dstport 8472 nolearning ttl auto ageing 300 [...]
+</code></pre><p>(I&rsquo;m cutting the output a little using <code>[...]</code>)</p>
+<p>Ah! There is our VXLAN interface. Now how does the traffic from <code>flannel.1</code> interface land in our <code>cni0</code> interface?</p>
+<p>According to information found in <a href="https://msazure.club/flannel-networking-demystify/">this amazing article</a> it is achieved by forwarding data using <code>iptables</code> from the bridge to the vxlan interface and vice versa.</p>
+<p>So in short, there are two interfaces - <code>flannel.1</code> which acts as virtual lan for our network of nodes, and <code>cni0</code> which acts as a bridge between containers and virtual lan.</p>
+<p>Each container in single node gets its own IP, and all these IPs are bridged using <code>cni0</code> network.</p>
+<p>We can see that here after we check the definition of <code>cni0</code> bridge</p>
+<pre><code>&gt; brctl show
+bridge name	bridge id		STP enabled	interfaces
+cni0		8000.b6a57ef61725	no		veth2cd71447
+							            veth86f7911b
+							            vethd2d58b32
+							            vethf2772684
+							            vethf314b245
+</code></pre><p>Every <code>veth</code> found in this bridge is a container on our node. Each of them has its own IP.</p>
+<h3 id="multi-node-k3d-cluster">Multi-node k3d cluster</h3>
+<p>So far we have analyzed what is configured on a single-node setup and how flannel looks like from that perspective.</p>
+<p>I&rsquo;ve created another cluster with 3 nodes, to see how different the routing table is. And boy it is.</p>
+<pre><code class="language-properties" data-lang="properties">&gt; route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         172.19.0.1      0.0.0.0         UG    0      0        0 eth0
+10.42.0.0       10.42.0.0       255.255.255.0   UG    0      0        0 flannel.1
+10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0
+10.42.2.0       10.42.2.0       255.255.255.0   UG    0      0        0 flannel.1
+172.19.0.0      0.0.0.0         255.255.0.0     U     0      0        0 eth0
+</code></pre><ul>
+<li>10.42.0.0, 10.42.1.0, 10.42.2.0 are all networks of nodes. For every new node we have a new route configured on every other node so that every node knows where to find each other.</li>
+<li>Containers are assigned IPs from the 10.42.N.0/24 range, that is from 10.42.N.1 through 10.42.N.254 Ips.</li>
+<li>We can spot an obvious limitation to that - we can only have at most 254 hosts on a single node.</li>
+<li>Another limitation is number of nodes - this is the same 254 limit as for pods.</li>
+</ul>
+<h3 id="flow-chart-of-flannel">Flow chart of flannel</h3>
+<p>So to follow the analogy from the previous ideas, we can draw following flow chart.</p>
+<figure><img src="flannel-2021-08-29-1706.png"style=""
+    />
+</figure>
+<p><em>Allow me to not draw arrows through every interface as that was too cluttered. Let&rsquo;s for simplification sake assume that it flows through all interfaces the arrow crosses</em></p>
+<h3 id="what-flannel-solves-for-us">What flannel solves for us</h3>
+<p>So by looking at above diagram it should be pretty clear why do we use flannel as networking interface:</p>
+<ul>
+<li>Each container gets its own IP address from the pool of 10.42.0.0/24</li>
+<li>Each node gets a pool of IP addresses from the range of 10.42.0.0/24 to 10.42.255.0/24.</li>
+<li>All inter-container traffic is handled through a single port of VXLAN</li>
+<li>IPs and routing is setup automatically (that&rsquo;s the job of flannel - to read the config from each node and configure its routing tables)</li>
+</ul>
+<h3 id="what-default-configuration-of-flannel-doesnt-solve">What default configuration of flannel doesn&rsquo;t solve</h3>
+<p>Traffic IS NOT encrypted between nodes, that means if there is someone in the same switching domain that your nodes are, they can listen to the traffic happening between them and be able to read it out.
+Assuming of course that you don&rsquo;t use encrypted protocol like HTTPS.</p>
+<p>To solve that problem you could use different tunneling technique like <code>ipsec</code> or <code>wireguard</code> per <a href="https://rancher.com/docs/k3s/latest/en/installation/network-options/#flannel-options">documentation on rancher website</a></p>
+<h2 id="additional-resources">Additional resources</h2>
+<p>These resources were helpful in understanding what flannel does:</p>
+<ul>
+<li><a href="https://programmer.help/blogs/practice-vxlan-under-linux.html">Practice VXLAN under Linux</a></li>
+<li><a href="https://ilearnedhowto.wordpress.com/2017/02/16/how-to-create-overlay-networks-using-linux-bridges-and-vxlans/">How to create overlay networks using linux bridges and VXLANs</a></li>
+<li><a href="https://msazure.club/flannel-networking-demystify/">Flannel networking demystified (! this article gets much more in detials than I did)</a></li>
+</ul>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
