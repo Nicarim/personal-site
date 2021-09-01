@@ -6,7 +6,21 @@
     <description>Recent content on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 19 Aug 2021 15:17:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 01 Sep 2021 17:07:44 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Understanding Flannel Networking in K3s</title>
+      <link>https://flicksfix.com/posts/understanding-flannel-networking-in-k3s/</link>
+      <pubDate>Wed, 01 Sep 2021 17:07:44 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/understanding-flannel-networking-in-k3s/</guid>
+      <description>How does it work without Flannel Assumption: I&amp;rsquo;m using host networking through these examples. You could utilize docker network for example, but to make it simple I wanted to stick to the fact below
+container network = host/node network
+If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to
+Like so:
+#1 Node 10.0.0.10
+ #1 Server Container binds onto port 5432 #2 Client Container connects to 127.</description>
+    </item>
+    
     <item>
       <title>Flashing Android 7 onto Lenovo A3500-FL (Custom ROM, Recovery)</title>
       <link>https://flicksfix.com/posts/flashing-android-7-lenovo-a3500-fl/</link>
