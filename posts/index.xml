@@ -6,7 +6,20 @@
     <description>Recent content in Blog on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 02 Sep 2021 14:23:03 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 02 Sep 2021 22:18:52 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Deploying Tailscale Vpn on K3s Kubernetes</title>
+      <link>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</link>
+      <pubDate>Thu, 02 Sep 2021 22:18:52 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</guid>
+      <description>This is gonna be rather short. I wanted to put all the info I gathered in a single place.
+Dockerfile There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.
+ https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile  You need to modify it slightly however
+Create file called entrypoint.sh (based on snippet)
+if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !</description>
+    </item>
+    
     <item>
       <title>Using Pulumi as Helm Alternative for Templating</title>
       <link>https://flicksfix.com/posts/using-pulumi-as-helm-alternative-for-templating/</link>

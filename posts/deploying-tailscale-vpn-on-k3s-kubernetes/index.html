@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Deploying Tailscale Vpn on K3s Kubernetes | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="This is gonna be rather short. I wanted to put all the info I gathered in a single place.
+Dockerfile There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.
+ https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile  You need to modify it slightly however
+Create file called entrypoint.sh (based on snippet)
+if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !">
+    <meta name="generator" content="Hugo 0.87.0" />
+    
+    <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+  </head>
+
+  <body >
+    <div class="is-hidden-print">
+      <h2 class="title is-2 block has-text-centered mt-6"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    </div>
+    <main role="main" class="container pl-4 pr-4">
+      
+<section id="main">
+  <h1 class="title is-2">Deploying Tailscale Vpn on K3s Kubernetes</h1>
+  <div>
+        <article class="content has-text-justified">
+           <p>This is gonna be rather short. I wanted to put all the info I gathered in a single place.</p>
+<h2 id="dockerfile">Dockerfile</h2>
+<p>There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.</p>
+<ul>
+<li><a href="https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile">https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile</a></li>
+</ul>
+<p>You need to modify it slightly however</p>
+<p>Create file called <code>entrypoint.sh</code> (based on <a href="https://gist.github.com/hamishforbes/2ac7ae9d7ea47cad4e3a813c9b45c10f">snippet</a>)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d /dev/net <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span> mkdir /dev/net; <span style="color:#66d9ef">fi</span>
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -e /dev/net/tun <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>  mknod /dev/net/tun c <span style="color:#ae81ff">10</span> 200; <span style="color:#66d9ef">fi</span>
+
+<span style="color:#75715e"># Wait 5s for the daemon to start and then run tailscale up to configure</span>
+/bin/sh -c <span style="color:#e6db74">&#34;sleep 5; tailscale up --authkey=</span><span style="color:#e6db74">${</span>TAILSCALE_AUTH<span style="color:#e6db74">}</span><span style="color:#e6db74"> -advertise-tags=</span><span style="color:#e6db74">${</span>TAILSCALE_TAGS<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> &amp;
+exec /usr/local/bin/tailscaled --state<span style="color:#f92672">=</span>/tailscale/tailscaled.state
+</code></pre></div><p>And put it into the same dir you have tailscale Dockerfile. You need to add that entrypoint to Dockerfile and use it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"># Copyright (c) 2020 Tailscale Inc &amp; AUTHORS All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+FROM golang:1.16-alpine AS build-env
+
+WORKDIR /go/src/tailscale
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# see build_docker.sh
+ARG VERSION_LONG=&#34;&#34;
+ENV VERSION_LONG=$VERSION_LONG
+ARG VERSION_SHORT=&#34;&#34;
+ENV VERSION_SHORT=$VERSION_SHORT
+ARG VERSION_GIT_HASH=&#34;&#34;
+ENV VERSION_GIT_HASH=$VERSION_GIT_HASH
+
+RUN go install -tags=xversion -ldflags=&#34;\
+      -X tailscale.com/version.Long=$VERSION_LONG \
+      -X tailscale.com/version.Short=$VERSION_SHORT \
+      -X tailscale.com/version.GitCommit=$VERSION_GIT_HASH&#34; \
+      -v ./cmd/...
+
+FROM alpine:3.14
+RUN apk add --no-cache ca-certificates iptables iproute2
+COPY --from=build-env /go/bin/* /usr/local/bin/
+<span style="color:#a6e22e">+COPY entrypoint.sh /entrypoint.sh
+</span><span style="color:#a6e22e"></span>
+<span style="color:#a6e22e">+ENTRYPOINT [&#34;/bin/sh&#34;, &#34;/entrypoint.sh&#34;]
+</span></code></pre></div><p>You can now build the dockerfile and it should work out of the box.</p>
+<h2 id="kubernetes-manifest">Kubernetes manifest</h2>
+<p>To test things out, I used following deployment</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tailscale</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tailscale</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nicarim/tailscale:v1.14.0-entrypoint2</span>
+        <span style="color:#f92672">securityContext</span>:
+          <span style="color:#f92672">capabilities</span>:
+            <span style="color:#f92672">add</span>:
+              - <span style="color:#ae81ff">NET_ADMIN</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:1.21.1</span>
+        <span style="color:#f92672">ports</span>:
+        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
+</code></pre></div><p>Change the image to your own, or use the one you see here - it should work just as in this post.</p>
+<p>After deploying the manifest, you need to authenticate your tailscale instance (if you didn&rsquo;t provide <code>TAILSCALE_AUTH</code> env variable)</p>
+<p>Check logs of tailscale pod and look for following line</p>
+<pre><code>│ tailscale 2021/09/02 00:00:00 control: doLogin(regen=false, hasUrl=true)             
+│ tailscale To authenticate, visit:                                                     
+│ tailscale     https://login.tailscale.com/a/&lt;cut&gt;
+</code></pre><p>Click the link and authenticate.</p>
+<p>THIS IS IN NO WAY PRODUCTION READY - I was just testing things out and wanted to put together a working example for <code>v1.14.0</code>.</p>
+<p>Helpful <a href="https://github.com/tailscale/tailscale/issues/504">thread on github</a></p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
