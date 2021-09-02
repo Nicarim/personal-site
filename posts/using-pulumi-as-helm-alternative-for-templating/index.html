@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Using Pulumi as Helm Alternative for Templating | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="I hate Helm I truly hate helm. It&rsquo;s not because it&rsquo;s a bad idea, core idea of Helm does actually solve a problem that you often meet with deploying manifest (customization). It&rsquo;s not because I don&rsquo;t know how to use it - I used it to create many deployments and I truly appreciate its existence.
+But I hate it to the heart.
+Why you might ask?
+It&rsquo;s because most of the time Helm tends to become total customization of the chart.">
+    <meta name="generator" content="Hugo 0.87.0" />
+    
+    <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+  </head>
+
+  <body >
+    <div class="is-hidden-print">
+      <h2 class="title is-2 block has-text-centered mt-6"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    </div>
+    <main role="main" class="container pl-4 pr-4">
+      
+<section id="main">
+  <h1 class="title is-2">Using Pulumi as Helm Alternative for Templating</h1>
+  <div>
+        <article class="content has-text-justified">
+           <h1 id="i-hate-helm">I hate Helm</h1>
+<p>I truly hate helm. It&rsquo;s not because it&rsquo;s a bad idea, core idea of Helm does actually solve a problem that you often meet with deploying manifest (customization). It&rsquo;s not because I don&rsquo;t know how to use it - I used it to create many deployments and I truly appreciate its existence.</p>
+<p>But I hate it to the heart.</p>
+<p>Why you might ask?</p>
+<p>It&rsquo;s because most of the time Helm tends to become total customization of the chart. Literally. If you try to use any off the shelf helm charts you will often meet with following dilemma:</p>
+<ul>
+<li>Should I customize that helm according to my need?
+<ul>
+<li>If yes, I need to untangle the spaghetti monster</li>
+<li>If not then see:</li>
+</ul>
+</li>
+<li>Should I create a new chart for my own needs?
+<ul>
+<li>If yes - I need to add just so much customization to fit my needs</li>
+<li>If not - I&rsquo;m left with kustomize or directly using manifests</li>
+</ul>
+</li>
+</ul>
+<h2 id="spaghetti-monster">Spaghetti monster</h2>
+<p>Grafana helm chart:
+<figure><img src="Pasted%20image%2020210902093820.png"style=""
+    />
+</figure></p>
+<p>I mean yeah, if you&rsquo;re familiar with what helm does and you&rsquo;ve done quite a few you will quickly come to understanding to what is going on.</p>
+<p>The thing is it&rsquo;s loser&rsquo;s game.</p>
+<p>Initially you use helm to be able to customize the image version, then you add image name because you might use your own registry, then you need to customize labels because you need to enable some traefik based rules, then you need to add tolerations and affinity, then you need to make conditional deployments based on environment&hellip;.</p>
+<p>The list goes on.</p>
+<p>In the end you end up with totally customizing the manifests that were simple in the beginning. And you do it to achieve &hellip; what exactly?</p>
+<p><strong>I have this feeling we do helm charts so we can have dumbed down manifests</strong></p>
+<p>And Helm doesn&rsquo;t help us much in that regards.</p>
+<p>Public helm charts are especially in the worst place. They simply CANNOT cater to everyone needs. Yet they try to do that. It&rsquo;s nice when you want to experiment, but you need to understand what the chart is doing, what are its params and using public charts is just asking for disaster (in terms of maintainability) IMO.</p>
+<h2 id="ready-made-manifests">Ready made manifests</h2>
+<p>Some projects decide it&rsquo;s not worth the trouble and they provide ready-made manifests <a href="https://github.com/argoproj/argo-cd/releases/tag/v2.1.1">like ArgoCD</a></p>
+<p>This is nice if you want to get started, as that manifest will get you up and running. But that becomes a problem if you decide to customize it. You basically have to copy and paste it&rsquo;s content and customize, write your own manifests or fallback onto creating helm chart out of the values you want to customize. Basically either use the ready made manifest, or DIY, no middleground. (Some might say kustomize is a middleground, but I don&rsquo;t buy it)</p>
+<p>There is <a href="https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd">community maintained helm chart</a> for argocd - but again, it provides you with &hellip; almost whole templating of the manifest.</p>
+<figure><img src="Pasted%20image%2020210902101339.png"style=""
+    />
+</figure>
+<p>Am I delusional or what we&rsquo;re actually solving here is just making DRY packages out of manifests? Like if you want to change the name of the app, you could edit it in 3 places in manifests or single value in helm. That&rsquo;s all? My god.</p>
+<p>Example in the image could&rsquo;ve been replaced with just providing ability to put whole <code>dict</code> as <code>livenessProbe</code> value&hellip; And if <code>livenessProbe</code> has additional property added that&rsquo;s not here, you&rsquo;re out of luck, make your own chart!</p>
+<p>&hellip;</p>
+<h1 id="looking-for-alternatives">Looking for alternatives</h1>
+<p>There are several tools available:</p>
+<ul>
+<li><a href="https://helm.sh/">helm</a> (our main rant target)</li>
+<li><a href="https://kustomize.io/">kustomize</a></li>
+<li><a href="https://tanka.dev/">tanka</a></li>
+<li><a href="https://jsonnet.org/">jsonnet</a></li>
+<li><a href="https://github.com/ksonnet/ksonnet">ksonnet</a> - unmaintaned</li>
+</ul>
+<p>I only used the first two of them, but I wanted to explore more.</p>
+<p>Oh also, there is infra as a code tooling that you could use to manage kubernetes like:</p>
+<ul>
+<li><a href="https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html">ansible</a> - This is some alternative, but like I mentioned in some other blog post - ansible won&rsquo;t be able to track removals of resources unless you explicitly ask for it (Helm handles that if you use it as package manager)</li>
+<li><a href="https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#authentication">terraform</a> - I really tried to love terraform in that regards, but managing kubernetes resources in helm is kind of a PITA. One thing you might often stumble upon is authentication issues if you&rsquo;re using <a href="https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#stacking-with-managed-kubernetes-cluster-resources">kubernetes resources in same module as your kubernetes cluster definition</a></li>
+<li><a href="https://www.pulumi.com/docs/intro/cloud-providers/kubernetes/">pulumi</a> - <strong>this is IMO a nice proposition to be able to manage your infrastructure using real language.</strong> And this is something I want to discover today</li>
+</ul>
+<h1 id="pulumi-as-yaml-manifests-provider">Pulumi as YAML manifests provider</h1>
+<p>I don&rsquo;t want to use full pulumi&rsquo;s capabilities. I&rsquo;d like to first merely evaluate it&rsquo;s templating proposition</p>
+<h2 id="getting-started-with-pulumi">Getting started with pulumi</h2>
+<h3 id="installing-on-manjaro">Installing on Manjaro</h3>
+<p>As I use manjaro, I simply used <code>yay pulumi</code> and installed first package from AUR <code>aur/pulumi-bin</code> version <code>3.11.0-1</code></p>
+<h3 id="configuring-local-state-backend">Configuring local state backend</h3>
+<p>By default pulumi wants you to use their service to store your state and manage it. I wanted to test it locally so I used</p>
+<pre><code>pulumi login --local
+</code></pre><h3 id="generating-basic-structure">Generating basic structure</h3>
+<p>Pulumi offers ready made templates for getting started, I used</p>
+<pre><code>pulumi new kubernetes-typescript
+</code></pre><p>And followed the guide to setup the project.</p>
+<pre><code>├── index.ts
+├── node_modules
+├── package.json
+├── package-lock.json
+├── Pulumi.dev.yaml
+├── Pulumi.yaml
+└── tsconfig.json
+</code></pre><p>This is the project structure that got generated.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ts" data-lang="ts"><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">as</span> <span style="color:#a6e22e">k8s</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;@pulumi/kubernetes&#34;</span>;
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">appLabels</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">app</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;nginx&#34;</span> };
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">deployment</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">apps</span>.<span style="color:#a6e22e">v1</span>.<span style="color:#a6e22e">Deployment</span>(<span style="color:#e6db74">&#34;nginx&#34;</span>, {
+    <span style="color:#a6e22e">spec</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">selector</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">matchLabels</span>: <span style="color:#66d9ef">appLabels</span> },
+        <span style="color:#a6e22e">replicas</span>: <span style="color:#66d9ef">1</span>,
+        <span style="color:#a6e22e">template</span><span style="color:#f92672">:</span> {
+            <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">labels</span>: <span style="color:#66d9ef">appLabels</span> },
+            <span style="color:#a6e22e">spec</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">containers</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;nginx&#34;</span>, <span style="color:#a6e22e">image</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;nginx&#34;</span> }] }
+        }
+    }
+});
+<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">deployment</span>.<span style="color:#a6e22e">metadata</span>.<span style="color:#a6e22e">name</span>;
+</code></pre></div><p>And this is example deployment within that structure. Let&rsquo;s try to apply it to <code>k3d</code> environment.</p>
+<h3 id="creating-yaml-provider">Creating YAML provider</h3>
+<pre><code>const provider = new k8s.Provider(&quot;k3d-testing&quot;, {
+    renderYamlToDirectory: &quot;output&quot;,
+})
+</code></pre><p>I&rsquo;ve created an instance of provider which will output the objects that were created during the pulumi run to a directory called <code>output</code> instead of trying to apply it onto the cluster.</p>
+<h3 id="adding-provider-to-resources">Adding provider to resources</h3>
+<p>For resources to use the provider, I need to add that provider as <code>CustomResourceOptions</code>, it&rsquo;s third argument in <code>Deployment</code> specification. It accepts key called <code>provider</code> with value of provider object that we want to use.</p>
+<p>This is final code</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">import * as k8s from &#34;@pulumi/kubernetes&#34;;
+import * as kx from &#34;@pulumi/kubernetesx&#34;;
+
+<span style="color:#a6e22e">+const provider = new k8s.Provider(&#34;k3d-testing&#34;, {
+</span><span style="color:#a6e22e">+    renderYamlToDirectory: &#34;output&#34;,
+</span><span style="color:#a6e22e">+})
+</span><span style="color:#a6e22e"></span>
+const appLabels = { app: &#34;nginx&#34; };
+const deployment = new k8s.apps.v1.Deployment(&#34;nginx&#34;, {
+    spec: {
+        selector: { matchLabels: appLabels },
+        replicas: 1,
+        template: {
+            metadata: { labels: appLabels },
+            spec: { containers: [{ name: &#34;nginx&#34;, image: &#34;nginx&#34; }] }
+        }
+    }
+<span style="color:#a6e22e">+}, { provider });
+</span><span style="color:#a6e22e"></span>
+export const name = deployment.metadata.name;
+</code></pre></div><h3 id="generating-yaml">Generating YAML</h3>
+<p>Now I was able to run <code>pulumi up</code> and after confirming the plan I&rsquo;ve got output directory with YAML files:</p>
+<pre><code>&gt; tree output                                     
+output
+├── 0-crd
+└── 1-manifest
+    └── deployment-default-nginx-z43htl4z.yaml
+</code></pre><p>And the YAML file is just as specified in the code.  Pretty neat.</p>
+<h3 id="moving-provider-configuration-to-global-scope">Moving provider configuration to global scope</h3>
+<p>Pulumi&rsquo;s documentation mentions 3 different ways to specify provider settings to the resource, one of them being explicit (just what we did), and other being &ldquo;Default provider config&rdquo; and &ldquo;Dynamic Providers&rdquo;</p>
+<p><a href="https://www.pulumi.com/docs/intro/concepts/resources/#default-provider-configuration">Documentation of Default provider config</a></p>
+<p>It says we can setup <code>pulumi config set aws:region us-west-2</code> to change provider&rsquo;s region in case of AWS.</p>
+<p>Syntax for that is <code>&lt;namespace&gt;:&lt;key&gt;</code> but quite honest - I got lost here. Where do I get namespace from? I guess for kubernetes provider it is <code>kubernetes</code> but documentation nowhere says how are these defined.</p>
+<p>I can just guess by going to provider settings and checking the url <code>https://www.pulumi.com/docs/reference/pkg/kubernetes/provider/</code> and conclude that <code>kubernetes</code> is the namespace they&rsquo;re talking about.</p>
+<p>Let&rsquo;s try to set it using CLI config.</p>
+<pre><code>pulumi config set &quot;kubernetes:renderYamlToDirectory&quot; &quot;output&quot;
+</code></pre><p>And running <code>pulumi up</code> shows us this:</p>
+<pre><code>Previewing update (dev):
+     Type                              Name                   Plan        Info
+     pulumi:pulumi:Stack               pulumi-kubernetes-dev              
+ +-  ├─ kubernetes:apps/v1:Deployment  nginx                  replace     [diff: ~metadata,provider]
+ -   └─ pulumi:providers:kubernetes    k3d-testing            delete      
+ 
+Resources:
+    - 2 to delete
+    +-1 to replace
+    3 changes. 1 unchanged
+</code></pre><p>Pretty scary, but agreeing to these changes just means it removes the custom provider and then it uses values we provided to the default config.</p>
+<p>It again just generated yaml to <code>output</code> directory just with slightly different values in&hellip; <code>metadata.name: nginx-huq9n9w3</code></p>
+<p>Huh</p>
+<p>So previously name of the nginx was <code>nginx-z43htl4z</code> but now we got <code>nginx-huq9n9w3</code></p>
+<h3 id="making-the-name-of-resource-static">Making the name of resource static</h3>
+<p>So that is no good, I want to keep track of the same nginx across changes that I make.</p>
+<p>Let&rsquo;s try to add <code>metadata.name</code> to our deployment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">const deployment = new k8s.apps.v1.Deployment(&#34;nginx&#34;, {
+<span style="color:#a6e22e">+    metadata: {
+</span><span style="color:#a6e22e">+        name: &#34;nginx&#34;
+</span><span style="color:#a6e22e">+   },
+</span><span style="color:#a6e22e"></span>    spec: {
+        selector: { matchLabels: appLabels },
+        replicas: 1,
+        template: {
+            metadata: { labels: appLabels },
+            spec: { containers: [{ name: &#34;nginx&#34;, image: &#34;nginx&#34; }] }
+        }
+    }
+});
+</code></pre></div><p>Yep, after adding it and applying to our yaml we&rsquo;ve got static name of our deployment. Just <code>nginx</code>.</p>
+<p>We could now apply that <code>nginx</code> config to our cluster and all would be good.</p>
+<h2 id="customization-using-pulumi">Customization using Pulumi</h2>
+<p>But that was easy example and nothing we couldn&rsquo;t achieve with simple yaml. This is even more verbose than yaml thanks to <code>{}</code> everywhere. So what&rsquo;s the benefit?</p>
+<p>We now need to try something more complicated like replicating Helm&rsquo;s behavior (just the templating part!) in Pulumi.</p>
+<p>I&rsquo;ll go with the previously mentioned ArgoCD project (which btw could replicate whole Helm&rsquo;s behavior of tracking changes) and try to make a customization for their provided yaml file.</p>
+<h3 id="importing-argocd-manifests">Importing ArgoCD manifests</h3>
+<p>For that, we will use <a href="https://www.pulumi.com/docs/reference/pkg/kubernetes/yaml/">yaml</a> resources in Kubernetes provider.</p>
+<p>Specifically we will use <code>ConfigFile</code>.</p>
+<p>Let&rsquo;s write some code for that - first let&rsquo;s start with something simple like importing the file and just outputting it without changes.</p>
+<p>First I&rsquo;ve created a directory structure of <code>k8s_manifests/argocd</code> in our project&rsquo;s root.</p>
+<p>Then I downloaded <a href="https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml">the manifest</a> from the repository of ArgoCD. As of writing that is <code>v2.1.1</code> version. I&rsquo;ve renamed it to <code>install-v2-1-1.yaml</code> to just reflect the version we will be using.</p>
+<p>Here is the code to import the manifest as Pulumi object:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ts" data-lang="ts"><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">as</span> <span style="color:#a6e22e">k8s</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;@pulumi/kubernetes&#34;</span>;
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
+    <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;</span>,
+});
+</code></pre></div><p>Let&rsquo;s generate it directly to our output dir.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">&gt; pulumi up          
+
+Previewing update (dev):
+     Type                                                 Name                         
+     pulumi:pulumi:Stack                                  pulumi-kubernetes-dev         
+<span style="color:#a6e22e">+   └─ kubernetes:yaml:ConfigFile                        argocd                      
+</span><span style="color:#a6e22e">+      ├─ kubernetes:core/v1:Service                           argocd-server-metrics   
+</span><span style="color:#a6e22e">+      ├─ kubernetes:core/v1:ConfigMap                         argocd-cmd-params-cm  
+</span><span style="color:#a6e22e"></span> 
+ # (... many more resources later ...)
+ 
+Resources:
+    + 41 to create
+    - 1 to delete
+    42 changes. 1 unchanged
+
+Do you want to perform this update? yes
+</code></pre></div><p>Applying it yields a nice output to our <code>output</code> dir with every resource seperated into its own file.</p>
+<pre><code>&gt; tree output
+output
+├── 0-crd
+│   ├── customresourcedefinition-default-applications.argoproj.io.yaml
+│   └── customresourcedefinition-default-appprojects.argoproj.io.yaml
+└── 1-manifest
+    ├── clusterrolebinding-default-argocd-application-controller.yaml
+    ├── clusterrolebinding-default-argocd-server.yaml
+    ├── clusterrole-default-argocd-application-controller.yaml
+    ├── clusterrole-default-argocd-server.yaml
+    ├── configmap-default-argocd-cmd-params-cm.yaml
+    ├── configmap-default-argocd-cm.yaml
+    ├── configmap-default-argocd-gpg-keys-cm.yaml
+    ├── configmap-default-argocd-rbac-cm.yaml
+    ├── configmap-default-argocd-ssh-known-hosts-cm.yaml
+    ├── configmap-default-argocd-tls-certs-cm.yaml
+    ├── deployment-default-argocd-dex-server.yaml
+    ├── deployment-default-argocd-redis.yaml
+    ├── deployment-default-argocd-repo-server.yaml
+    ├── deployment-default-argocd-server.yaml
+    ├── networkpolicy-default-argocd-application-controller-network-policy.yaml
+    ├── networkpolicy-default-argocd-dex-server-network-policy.yaml
+    ├── networkpolicy-default-argocd-redis-network-policy.yaml
+    ├── networkpolicy-default-argocd-repo-server-network-policy.yaml
+    ├── networkpolicy-default-argocd-server-network-policy.yaml
+    ├── rolebinding-default-argocd-application-controller.yaml
+    ├── rolebinding-default-argocd-dex-server.yaml
+    ├── rolebinding-default-argocd-redis.yaml
+    ├── rolebinding-default-argocd-server.yaml
+    ├── role-default-argocd-application-controller.yaml
+    ├── role-default-argocd-dex-server.yaml
+    ├── role-default-argocd-server.yaml
+    ├── secret-default-argocd-secret.yaml
+    ├── serviceaccount-default-argocd-application-controller.yaml
+    ├── serviceaccount-default-argocd-dex-server.yaml
+    ├── serviceaccount-default-argocd-redis.yaml
+    ├── serviceaccount-default-argocd-server.yaml
+    ├── service-default-argocd-dex-server.yaml
+    ├── service-default-argocd-metrics.yaml
+    ├── service-default-argocd-redis.yaml
+    ├── service-default-argocd-repo-server.yaml
+    ├── service-default-argocd-server-metrics.yaml
+    ├── service-default-argocd-server.yaml
+    └── statefulset-default-argocd-application-controller.yaml
+
+2 directories, 40 files
+</code></pre><p>That&rsquo;s pretty neat!</p>
+<p>It has also put CRD (Custom Resource Definition) into separate directory which is crucial for applications using CRDs. If you try to apply manifests in reverse order - first deployments and stuff and then CRD - you might meet with errors that there is no such resource or stuff like that.</p>
+<h3 id="customizing-argocd-manifest">Customizing ArgoCD manifest</h3>
+<p>Now to the meat of what we need - let&rsquo;s try to modify our deployments so that all deployments tolerate dedicated node for deploying argoCD.</p>
+<p>For that we need to apply <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/">toleration</a> to our deployment</p>
+<h4 id="using-transformations">Using transformations</h4>
+<p>Pulumi offers functionality called <a href="https://www.pulumi.com/docs/intro/concepts/resources/#transformations">transformations</a> which allow you to make changes to the objects produced by your provider.</p>
+<p>I&rsquo;ll be quite honest that this function is quite complicated to me at first and I&rsquo;ve had need to reread the documentation over and over since it doesn&rsquo;t provide anymore examples than what you&rsquo;ve seen.</p>
+<p>But I was able to find <a href="https://pulumi.awsworkshop.io/additional-content/150_deploying_argocd_to_eks/30_declare_argocd_helm_chart.html">another example on awsworkshop.io</a> which helped me understand it a little bit better.</p>
+<p>Here is my explanation on how to use it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ts" data-lang="ts"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
+    <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;</span>,
+    <span style="color:#a6e22e">transformations</span><span style="color:#f92672">:</span> [
+        (<span style="color:#a6e22e">obj</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
+            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>)
+        }
+    ]
+});
+
+</code></pre></div><p>Key <code>transformations</code> accepts a list of functions (anonymous, named, any), and every function will be called for every object generated by the resource. In case of <code>ConfigFile</code> it calls it for every resource found in the manifest.</p>
+<p>Example <code>obj</code> that you will on pulumi run:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ts" data-lang="ts"><span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">apiVersion</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;apps/v1&#39;</span>,
+  <span style="color:#a6e22e">kind</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Deployment&#39;</span>,
+  <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> {
+	<span style="color:#a6e22e">labels</span><span style="color:#f92672">:</span> {
+	  <span style="color:#e6db74">&#39;app.kubernetes.io/component&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;server&#39;</span>,
+	  <span style="color:#e6db74">&#39;app.kubernetes.io/name&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;argocd-server&#39;</span>,
+	  <span style="color:#e6db74">&#39;app.kubernetes.io/part-of&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;argocd&#39;</span>
+	},
+	<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;argocd-server&#39;</span>
+  },
+  <span style="color:#a6e22e">spec</span><span style="color:#f92672">:</span> {
+	<span style="color:#a6e22e">selector</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">matchLabels</span><span style="color:#f92672">:</span> [Object] },
+	<span style="color:#a6e22e">template</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> [Object], <span style="color:#a6e22e">spec</span><span style="color:#f92672">:</span> [Object] }
+  }
+}
+</code></pre></div><p>That is a single call of your transformation function.</p>
+<p>Now what we need to do is wait for the function to be called with <code>kind: Deployment</code> and make our change to the object.</p>
+<p>To do that we can write following code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">const example = new k8s.yaml.ConfigFile(&#34;argocd&#34;, {
+    file: &#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;,
+    transformations: [
+        (obj: any) =&gt; {
+<span style="color:#a6e22e">+           if (obj.kind == &#34;Deployment&#34; &amp;&amp; obj.apiVersion == &#34;apps/v1&#34;) {
+</span><span style="color:#a6e22e">+               // Here is our deployment, let&#39;s add toleration
+</span><span style="color:#a6e22e">+               obj.spec.template.spec.tolerations = [{
+</span><span style="color:#a6e22e">+                   key: &#34;example-key&#34;,
+</span><span style="color:#a6e22e">+                   operator: &#34;Exists&#34;,
+</span><span style="color:#a6e22e">+                   effect: &#34;NoSchedule&#34;,
+</span><span style="color:#a6e22e">+               }]
+</span><span style="color:#a6e22e"></span>            }
+        }
+    ]
+});
+
+</code></pre></div><p>This will generate following YAML diff (difference between previous as-is and modified YAML)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">diff --git a/output/1-manifest/deployment-default-argocd-dex-server.yaml b/output/1-manifest/deployment-default-argocd-dex-server.yaml
+index 16c5463..13ef072 100644
+<span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-dex-server.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-dex-server.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -63,6 +63,10 @@ spec:
+</span><span style="color:#75715e"></span>         - mountPath: /tmp
+           name: dexconfig
+       serviceAccountName: argocd-dex-server
+<span style="color:#a6e22e">+      tolerations:
+</span><span style="color:#a6e22e">+      - effect: NoSchedule
+</span><span style="color:#a6e22e">+        key: example-key
+</span><span style="color:#a6e22e">+        operator: Exists
+</span><span style="color:#a6e22e"></span>       volumes:
+       - emptyDir: {}
+         name: static-files
+diff --git a/output/1-manifest/deployment-default-argocd-redis.yaml b/output/1-manifest/deployment-default-argocd-redis.yaml
+index e281df7..5e35df1 100644
+<span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-redis.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-redis.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -49,3 +49,7 @@ spec:
+</span><span style="color:#75715e"></span>         runAsNonRoot: true
+         runAsUser: 999
+       serviceAccountName: argocd-redis
+<span style="color:#a6e22e">+      tolerations:
+</span><span style="color:#a6e22e">+      - effect: NoSchedule
+</span><span style="color:#a6e22e">+        key: example-key
+</span><span style="color:#a6e22e">+        operator: Exists
+</span><span style="color:#a6e22e"></span>diff --git a/output/1-manifest/deployment-default-argocd-repo-server.yaml b/output/1-manifest/deployment-default-argocd-repo-server.yaml
+index 67f93bd..bb6c828 100644
+<span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-repo-server.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-repo-server.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -153,6 +153,10 @@ spec:
+</span><span style="color:#75715e"></span>           name: argocd-repo-server-tls
+         - mountPath: /tmp
+           name: tmp
+<span style="color:#a6e22e">+      tolerations:
+</span><span style="color:#a6e22e">+      - effect: NoSchedule
+</span><span style="color:#a6e22e">+        key: example-key
+</span><span style="color:#a6e22e">+        operator: Exists
+</span><span style="color:#a6e22e"></span>       volumes:
+       - configMap:
+           name: argocd-ssh-known-hosts-cm
+diff --git a/output/1-manifest/deployment-default-argocd-server.yaml b/output/1-manifest/deployment-default-argocd-server.yaml
+index d3d0776..80d3a5b 100644
+<span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-server.yaml
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-server.yaml
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -219,6 +219,10 @@ spec:
+</span><span style="color:#75715e"></span>         - mountPath: /tmp
+           name: tmp
+       serviceAccountName: argocd-server
+<span style="color:#a6e22e">+      tolerations:
+</span><span style="color:#a6e22e">+      - effect: NoSchedule
+</span><span style="color:#a6e22e">+        key: example-key
+</span><span style="color:#a6e22e">+        operator: Exists
+</span><span style="color:#a6e22e"></span>       volumes:
+       - emptyDir: {}
+         name: plugins-home
+
+</code></pre></div><p>Now that&rsquo;s pretty cool. But the code is quite ugly - there is so many ifs and it is not apparent on how it works at a first glance.</p>
+<p>How can we make the code better?</p>
+<h4 id="making-transformations-mixins">Making transformations mixins</h4>
+<p>We can create our own library of transformations!
+Strength of the programming languge at our disposal is that we can do whatever we want. (Of course that&rsquo;s also our weakness, you can do <em>whatever you want</em>)</p>
+<p>But FWIW let&rsquo;s make a transformation mixin. We will call it <code>AddDeploymentTolerationMixin</code> that will add to all deployments tolerations that we specify.</p>
+<p>What we can do is we can return a prepared closure with arguments that we specify.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ts" data-lang="ts"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">AddDeploymentTolerationMixin</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">toleration</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
+    <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">obj</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">kind</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Deployment&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">apiVersion</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;apps/v1&#34;</span>) {
+            <span style="color:#75715e">// Here is our deployment, let&#39;s add toleration
+</span><span style="color:#75715e"></span>            <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">spec</span>.<span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">spec</span>.<span style="color:#a6e22e">tolerations</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">toleration</span>]
+        }
+    }
+}
+</code></pre></div><p>This is our mixin that will add toleration to deployments. It&rsquo;s pretty simple and will do most of the job so we can just forget about its implementation details.</p>
+<p>Now onto the eye candy</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ts" data-lang="ts"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
+    <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;</span>,
+    <span style="color:#a6e22e">transformations</span><span style="color:#f92672">:</span> [
+        <span style="color:#a6e22e">AddDeploymentTolerationMixin</span>({
+            <span style="color:#a6e22e">key</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;new-key&#34;</span>,
+            <span style="color:#a6e22e">operator</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Exists&#34;</span>,
+            <span style="color:#a6e22e">effect</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;NoSchedule&#34;</span>,
+        })
+    ]
+});
+</code></pre></div><p>Now we&rsquo;ve abstracted away the transformation and it&rsquo;s pretty clear what it does. We can reuse it for all of our deployments that origin from ready-made manifests!</p>
+<h1 id="wrapping-up">Wrapping up</h1>
+<p>Ok that was pretty extensive write up. I wanted to see how viable pulumi is for generating the yamls, and this looks really cool. One thing which makes it a little bit annoying is the fact that Pulumi was not made for templating only and it&rsquo;s best if you use full features of it (make it manage the cluster) because otherwise the tool will feel prety bulky.</p>
+<p>But the good news is that if you use Pulumi to manage these manifests you will probably replicate most of the functionality of Helm (since it will take care of cleaning and updating the resources).</p>
+<p>I&rsquo;m impressed by how easy it was to customize the manifest, and I honestly think we should take that approach instead of Helm&rsquo;s hell.</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
