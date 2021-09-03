@@ -6,7 +6,19 @@
     <description>Recent content on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 02 Sep 2021 22:18:52 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 03 Sep 2021 22:49:50 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>I Give Up on Traefik Its Too Complicated</title>
+      <link>https://flicksfix.com/posts/i-give-up-on-traefik-its-too-complicated/</link>
+      <pubDate>Fri, 03 Sep 2021 22:49:50 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/i-give-up-on-traefik-its-too-complicated/</guid>
+      <description>Mind you, this is kind of a clickbaitish, but what I mean exactly is that traefik is too complicated for personal k3s setup.
+Trying to setup traefik from scratch I&amp;rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&amp;rsquo;s all nice and running and then there is this.
+I&amp;rsquo;ve created IngressRoute
+apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: app.kubernetes.io/managed-by: pulumi name: dashboard namespace: traefik-tailscale spec: entryPoints: - websecure routes: - kind: Rule match: PathPrefix(`/dashboard`) || PathPrefix(`/api`) services: - kind: TraefikService name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).</description>
+    </item>
+    
     <item>
       <title>Deploying Tailscale Vpn on K3s Kubernetes</title>
       <link>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</link>
