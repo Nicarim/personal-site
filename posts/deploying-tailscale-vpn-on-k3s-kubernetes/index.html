@@ -11,7 +11,7 @@ Dockerfile There is no official docker image available yet. There is however off
  https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile  You need to modify it slightly however
 Create file called entrypoint.sh (based on snippet)
 if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !">
-    <meta name="generator" content="Hugo 0.87.0" />
+    <meta name="generator" content="Hugo 0.93.2" />
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -82,80 +82,80 @@ if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !">
 </ul>
 <p>You need to modify it slightly however</p>
 <p>Create file called <code>entrypoint.sh</code> (based on <a href="https://gist.github.com/hamishforbes/2ac7ae9d7ea47cad4e3a813c9b45c10f">snippet</a>)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d /dev/net <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span> mkdir /dev/net; <span style="color:#66d9ef">fi</span>
-<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -e /dev/net/tun <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>  mknod /dev/net/tun c <span style="color:#ae81ff">10</span> 200; <span style="color:#66d9ef">fi</span>
-
-<span style="color:#75715e"># Wait 5s for the daemon to start and then run tailscale up to configure</span>
-/bin/sh -c <span style="color:#e6db74">&#34;sleep 5; tailscale up --authkey=</span><span style="color:#e6db74">${</span>TAILSCALE_AUTH<span style="color:#e6db74">}</span><span style="color:#e6db74"> -advertise-tags=</span><span style="color:#e6db74">${</span>TAILSCALE_TAGS<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> &amp;
-exec /usr/local/bin/tailscaled --state<span style="color:#f92672">=</span>/tailscale/tailscaled.state
-</code></pre></div><p>And put it into the same dir you have tailscale Dockerfile. You need to add that entrypoint to Dockerfile and use it:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"># Copyright (c) 2020 Tailscale Inc &amp; AUTHORS All rights reserved.
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
-FROM golang:1.16-alpine AS build-env
-
-WORKDIR /go/src/tailscale
-
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY . .
-
-# see build_docker.sh
-ARG VERSION_LONG=&#34;&#34;
-ENV VERSION_LONG=$VERSION_LONG
-ARG VERSION_SHORT=&#34;&#34;
-ENV VERSION_SHORT=$VERSION_SHORT
-ARG VERSION_GIT_HASH=&#34;&#34;
-ENV VERSION_GIT_HASH=$VERSION_GIT_HASH
-
-RUN go install -tags=xversion -ldflags=&#34;\
-      -X tailscale.com/version.Long=$VERSION_LONG \
-      -X tailscale.com/version.Short=$VERSION_SHORT \
-      -X tailscale.com/version.GitCommit=$VERSION_GIT_HASH&#34; \
-      -v ./cmd/...
-
-FROM alpine:3.14
-RUN apk add --no-cache ca-certificates iptables iproute2
-COPY --from=build-env /go/bin/* /usr/local/bin/
-<span style="color:#a6e22e">+COPY entrypoint.sh /entrypoint.sh
-</span><span style="color:#a6e22e"></span>
-<span style="color:#a6e22e">+ENTRYPOINT [&#34;/bin/sh&#34;, &#34;/entrypoint.sh&#34;]
-</span></code></pre></div><p>You can now build the dockerfile and it should work out of the box.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d /dev/net <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span> mkdir /dev/net; <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -e /dev/net/tun <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>  mknod /dev/net/tun c <span style="color:#ae81ff">10</span> 200; <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Wait 5s for the daemon to start and then run tailscale up to configure</span>
+</span></span><span style="display:flex;"><span>/bin/sh -c <span style="color:#e6db74">&#34;sleep 5; tailscale up --authkey=</span><span style="color:#e6db74">${</span>TAILSCALE_AUTH<span style="color:#e6db74">}</span><span style="color:#e6db74"> -advertise-tags=</span><span style="color:#e6db74">${</span>TAILSCALE_TAGS<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> &amp;
+</span></span><span style="display:flex;"><span>exec /usr/local/bin/tailscaled --state<span style="color:#f92672">=</span>/tailscale/tailscaled.state
+</span></span></code></pre></div><p>And put it into the same dir you have tailscale Dockerfile. You need to add that entrypoint to Dockerfile and use it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span># Copyright (c) 2020 Tailscale Inc &amp; AUTHORS All rights reserved.
+</span></span><span style="display:flex;"><span># Use of this source code is governed by a BSD-style
+</span></span><span style="display:flex;"><span># license that can be found in the LICENSE file.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FROM golang:1.16-alpine AS build-env
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>WORKDIR /go/src/tailscale
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>COPY go.mod go.sum ./
+</span></span><span style="display:flex;"><span>RUN go mod download
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>COPY . .
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># see build_docker.sh
+</span></span><span style="display:flex;"><span>ARG VERSION_LONG=&#34;&#34;
+</span></span><span style="display:flex;"><span>ENV VERSION_LONG=$VERSION_LONG
+</span></span><span style="display:flex;"><span>ARG VERSION_SHORT=&#34;&#34;
+</span></span><span style="display:flex;"><span>ENV VERSION_SHORT=$VERSION_SHORT
+</span></span><span style="display:flex;"><span>ARG VERSION_GIT_HASH=&#34;&#34;
+</span></span><span style="display:flex;"><span>ENV VERSION_GIT_HASH=$VERSION_GIT_HASH
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>RUN go install -tags=xversion -ldflags=&#34;\
+</span></span><span style="display:flex;"><span>      -X tailscale.com/version.Long=$VERSION_LONG \
+</span></span><span style="display:flex;"><span>      -X tailscale.com/version.Short=$VERSION_SHORT \
+</span></span><span style="display:flex;"><span>      -X tailscale.com/version.GitCommit=$VERSION_GIT_HASH&#34; \
+</span></span><span style="display:flex;"><span>      -v ./cmd/...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FROM alpine:3.14
+</span></span><span style="display:flex;"><span>RUN apk add --no-cache ca-certificates iptables iproute2
+</span></span><span style="display:flex;"><span>COPY --from=build-env /go/bin/* /usr/local/bin/
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">+COPY entrypoint.sh /entrypoint.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">+ENTRYPOINT [&#34;/bin/sh&#34;, &#34;/entrypoint.sh&#34;]
+</span></span></span></code></pre></div><p>You can now build the dockerfile and it should work out of the box.</p>
 <h2 id="kubernetes-manifest">Kubernetes manifest</h2>
 <p>To test things out, I used following deployment</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tailscale</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">selector</span>:
-    <span style="color:#f92672">matchLabels</span>:
-      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
-  <span style="color:#f92672">template</span>:
-    <span style="color:#f92672">metadata</span>:
-      <span style="color:#f92672">labels</span>:
-        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
-    <span style="color:#f92672">spec</span>:
-      <span style="color:#f92672">containers</span>:
-      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tailscale</span>
-        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nicarim/tailscale:v1.14.0-entrypoint2</span>
-        <span style="color:#f92672">securityContext</span>:
-          <span style="color:#f92672">capabilities</span>:
-            <span style="color:#f92672">add</span>:
-              - <span style="color:#ae81ff">NET_ADMIN</span>
-      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
-        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:1.21.1</span>
-        <span style="color:#f92672">ports</span>:
-        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
-</code></pre></div><p>Change the image to your own, or use the one you see here - it should work just as in this post.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tailscale</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">tailscale</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tailscale</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nicarim/tailscale:v1.14.0-entrypoint2</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">securityContext</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">capabilities</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">add</span>:
+</span></span><span style="display:flex;"><span>              - <span style="color:#ae81ff">NET_ADMIN</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:1.21.1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
+</span></span></code></pre></div><p>Change the image to your own, or use the one you see here - it should work just as in this post.</p>
 <p>After deploying the manifest, you need to authenticate your tailscale instance (if you didn&rsquo;t provide <code>TAILSCALE_AUTH</code> env variable)</p>
 <p>Check logs of tailscale pod and look for following line</p>
-<pre><code>│ tailscale 2021/09/02 00:00:00 control: doLogin(regen=false, hasUrl=true)             
+<pre tabindex="0"><code>│ tailscale 2021/09/02 00:00:00 control: doLogin(regen=false, hasUrl=true)             
 │ tailscale To authenticate, visit:                                                     
 │ tailscale     https://login.tailscale.com/a/&lt;cut&gt;
 </code></pre><p>Click the link and authenticate.</p>

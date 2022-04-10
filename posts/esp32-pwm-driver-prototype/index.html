@@ -9,7 +9,7 @@
     <meta name="description" content="After spending a couple of days laying in my bed with absolute no motivation at all to do anything I&rsquo;ve decided to do anything that will bring me from the lair of despair.
 COVID situation here in Poland at the moment of writing the post is not really great, there is absolutely nothing to do outside because everything is cancelled.
 I can either tinker in my &ldquo;electronic workshop&rdquo; or do programming which I couldn&rsquo;t really keep motivation for.">
-    <meta name="generator" content="Hugo 0.87.0" />
+    <meta name="generator" content="Hugo 0.93.2" />
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -178,7 +178,7 @@ and connect 3.3V output directly to 3.3V input, or step it down to 5V externally
 Seriously, if you haven’t heard about it go check it out.
 It basically allows you to write software for ESP using simple declarative YAML for whatever components you want to support in your code.</p>
 <p>For my use case, this YAML was enough to get it up and running in no time.</p>
-<pre><code>esphome:
+<pre tabindex="0"><code>esphome:
   name: curtain_led
   platform: ESP32
   board: nodemcu-32s
@@ -193,7 +193,7 @@ mqtt:
 
 light:
   - platform: cwww
-    name: &quot;Curtain LED&quot;
+    name: &#34;Curtain LED&#34;
     cold_white: gpio_18
     warm_white: gpio_19
     cold_white_color_temperature: 5500K
