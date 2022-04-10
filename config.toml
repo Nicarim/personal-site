@@ -10,6 +10,11 @@ changefreq = 'monthly'
 filename = 'sitemap.xml'
 priority = 0.5
 
+[markup]
+    [markup.goldmark]
+        [markup.goldmark.renderer]
+            unsafe = true
+
 # [menu]
 #     [[menu.main]]
 #         identifier = "about"

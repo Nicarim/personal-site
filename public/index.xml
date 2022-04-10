@@ -6,7 +6,18 @@
     <description>Recent content on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 03 Sep 2021 22:49:50 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 10 Apr 2022 17:58:03 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Contributing to Openwrt for the first time TP-Link RE650 V2</title>
+      <link>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</link>
+      <pubDate>Sun, 10 Apr 2022 17:58:03 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</guid>
+      <description>Buying a new AP to cover more space So I recently moved to a new flat. This was a significant upgrade for me, since before I was living in almost 40m2 and a single AP was enough.
+However, once I moved to almost 80m2 - it turns out single AP cannot cover 5GHz for the whole flat, so I had to buy another one.
+I wanted to buy something cheap &amp;amp; reliable.</description>
+    </item>
+    
     <item>
       <title>I Give Up on Traefik Its Too Complicated</title>
       <link>https://flicksfix.com/posts/i-give-up-on-traefik-its-too-complicated/</link>
@@ -16,7 +27,7 @@
       <description>Mind you, this is kind of a clickbaitish, but what I mean exactly is that traefik is too complicated for personal k3s setup.
 Trying to setup traefik from scratch I&amp;rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&amp;rsquo;s all nice and running and then there is this.
 I&amp;rsquo;ve created IngressRoute
-apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: app.kubernetes.io/managed-by: pulumi name: dashboard namespace: traefik-tailscale spec: entryPoints: - websecure routes: - kind: Rule match: PathPrefix(`/dashboard`) || PathPrefix(`/api`) services: - kind: TraefikService name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).</description>
+apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata:  labels:  app.kubernetes.io/managed-by: pulumi  name: dashboard  namespace: traefik-tailscale spec:  entryPoints:  - websecure  routes:  - kind: Rule  match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)  services:  - kind: TraefikService  name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).</description>
     </item>
     
     <item>
