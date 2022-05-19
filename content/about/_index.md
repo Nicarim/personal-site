@@ -13,7 +13,15 @@ Always open to teach others about my work and share my knowledge.
 
 Main tools at my disposal: Python 3, Go, AWS, Bash, Kubernetes, AWS Lambda/Serverless, SQL. 
 
-# Professional Experience (6 years)
+# Professional Experience (7 years)
+
+{{< small "Sep 2021 - currently" >}}
+#### Platform Engineer, Stackerhq.com
+- Migrating platform to infrastructure as a code
+- Developing internal tooling to automate the deployment
+- Create environments as a service using ArgoCD and git
+- Advocate developers for best practicies around the infrastructure
+- Helping build scalable platform to be used by the customers. 
 
 {{< small "Jun 2021 - Jul 2021 - 2 months" >}}
 #### Site Reliability Engineer, Northern.Tech / Mender.io
