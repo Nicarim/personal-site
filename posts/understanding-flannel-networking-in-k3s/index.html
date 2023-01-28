@@ -11,8 +11,8 @@ container network = host/node network
 If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to
 Like so:
 #1 Node 10.0.0.10
- #1 Server Container binds onto port 5432 #2 Client Container connects to 127.">
-    <meta name="generator" content="Hugo 0.98.0" />
+#1 Server Container binds onto port 5432 #2 Client Container connects to 127.">
+    <meta name="generator" content="Hugo 0.108.0">
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -133,65 +133,65 @@ Like so:
 <p>Flannel in its default configuration uses so called VXLAN. It setups a one-to-many network on a single port <code>8472</code> (IANA specifies that port to be <code>4789</code>) with routing achieved thanks to Linux built in support for VXLAN.</p>
 <h3 id="testing-out-in-k3d">Testing out in k3d</h3>
 <p>I&rsquo;ve used k3d to create testing k3s setup using</p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">k3d cluster create flannel-testing 
-</code></pre><p>This creates a cluster with a single node.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">k3d</span> <span style="color:#e6db74">cluster create flannel-testing </span>
+</span></span></code></pre></div><p>This creates a cluster with a single node.</p>
 <p>Now we can check how is flannel configured on the single node setup. To SSH into the node I use <code>k9s</code> with <code>node-shell</code> <a href="https://github.com/derailed/k9s#node-shell">configured</a>. Thanks to that I can create shell instance on any node I want and see node&rsquo;s configuration.</p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">/ # ip route
-default via 172.18.0.1 dev eth0 
-10.42.0.0/24 dev cni0 scope link  src 10.42.0.1 
-172.18.0.0/16 dev eth0 scope link  src 172.18.0.2
-</code></pre><p>We can see two interfaces - one for <code>eth0</code> and one for <code>cni0</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">/</span> <span style="color:#e6db74"># ip route</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">default</span> <span style="color:#e6db74">via 172.18.0.1 dev eth0 </span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">10.42.0.0/24</span> <span style="color:#e6db74">dev cni0 scope link  src 10.42.0.1 </span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">172.18.0.0/16</span> <span style="color:#e6db74">dev eth0 scope link  src 172.18.0.2</span>
+</span></span></code></pre></div><p>We can see two interfaces - one for <code>eth0</code> and one for <code>cni0</code>.</p>
 <p>Because k3d stands for <code>K3s in Docker</code> we can examine where each interface comes from.</p>
 <p><code>eth0</code> can be seen in output of <code>docker network ls</code></p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">&gt; docker network ls
-80e3c272a268   k3d-flannel-testing   bridge    local
-</code></pre><p>To see what CIDR it uses we can inspect it using <code>docker network inspect 80e3c272a268</code></p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">&gt; docker network inspect 80e3c272a268
-[...]
-&#34;IPAM&#34;: {
-	&#34;Driver&#34;: &#34;default&#34;,
-	&#34;Options&#34;: null,
-	&#34;Config&#34;: [
-		{
-			&#34;Subnet&#34;: &#34;172.18.0.0/16&#34;,
-			&#34;Gateway&#34;: &#34;172.18.0.1&#34;
-		}
-	]
-},
-</code></pre><p>And this is where <code>eth0</code> comes from. But where is <code>cni0</code> defined?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">&gt;</span> <span style="color:#e6db74">docker network ls</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">80e3c272a268</span>   <span style="color:#e6db74">k3d-flannel-testing   bridge    local</span>
+</span></span></code></pre></div><p>To see what CIDR it uses we can inspect it using <code>docker network inspect 80e3c272a268</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">&gt;</span> <span style="color:#e6db74">docker network inspect 80e3c272a268</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">[...]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">&#34;IPAM&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">&#34;Driver&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;default&#34;,</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">&#34;Options&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">null,</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">&#34;Config&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">[</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">		{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">&#34;Subnet&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;172.18.0.0/16&#34;,</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">&#34;Gateway&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;172.18.0.1&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">		}</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">	]</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">},</span>
+</span></span></code></pre></div><p>And this is where <code>eth0</code> comes from. But where is <code>cni0</code> defined?</p>
 <p>I&rsquo;d like to find out about it not because I know it&rsquo;s flannel, but using OS native tooling so this is universal advice.</p>
 <p>Turns out it&rsquo;s not really easy when using <code>busybox</code> image as it doesn&rsquo;t provide necessary information in <code>ip</code> outputs (doesn&rsquo;t support <code>-details</code> flag for example). So I need to use different image for that.</p>
 <p>So I replaced <code>busybox</code> with <a href="https://hub.docker.com/r/nicolaka/netshoot">nicolaka/netshoot</a>.</p>
 <p>Now we can check what is <code>cni0</code> by typing out</p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">&gt; ip -details link show cni0
-cni0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-    link/ether b6:a5:7e:f6:17:25 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535
-	bridge forward_delay [...]
-</code></pre><p>It turns out <code>cni0</code> is not a VXLAN interface? Where is our vxlan interface?</p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">&gt; ip link show
-1: lo: [..]
-2: flannel.1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default 
-    link/ether 12:c0:9a:88:11:82 brd ff:ff:ff:ff:ff:ff
-3: cni0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-    link/ether b6:a5:7e:f6:17:25 brd ff:ff:ff:ff:ff:ff
-5: vethf2772684@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
-    link/ether 42:c1:fd:fe:42:e5 brd ff:ff:ff:ff:ff:ff link-netnsid 2
-7: vethf314b245@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
-    link/ether 52:2b:6e:1b:66:61 brd ff:ff:ff:ff:ff:ff link-netnsid 4
-8: veth2cd71447@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
-    link/ether d2:e1:b3:06:8a:ed brd ff:ff:ff:ff:ff:ff link-netnsid 5
-9: eth0@if10: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
-    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-10: veth86f7911b@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
-    link/ether be:4e:7b:f5:8c:12 brd ff:ff:ff:ff:ff:ff link-netnsid 1
-11: vethd2d58b32@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default 
-    link/ether f6:2a:73:93:e9:ca brd ff:ff:ff:ff:ff:ff link-netnsid 6
-</code></pre><p>There are plenty of interfaces! We can probably guess now which do we want to check next.</p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">&gt; ip -details link show flannel.1
-2: flannel.1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default 
-    link/ether 12:c0:9a:88:11:82 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535 
-    vxlan id 1 local 172.18.0.2 dev eth0 srcport 0 0 dstport 8472 nolearning ttl auto ageing 300 [...]
-</code></pre><p>(I&rsquo;m cutting the output a little using <code>[...]</code>)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">&gt;</span> <span style="color:#e6db74">ip -details link show cni0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">cni0</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP mode DEFAULT group default qlen 1000</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">b6:a5:7e:f6:17:25 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">bridge</span> <span style="color:#e6db74">forward_delay [...]</span>
+</span></span></code></pre></div><p>It turns out <code>cni0</code> is not a VXLAN interface? Where is our vxlan interface?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">&gt;</span> <span style="color:#e6db74">ip link show</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">1</span><span style="color:#f92672">:</span> <span style="color:#e6db74">lo: [..]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">flannel.1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">12:c0:9a:88:11:82 brd ff:ff:ff:ff:ff:ff</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">3</span><span style="color:#f92672">:</span> <span style="color:#e6db74">cni0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP mode DEFAULT group default qlen 1000</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">b6:a5:7e:f6:17:25 brd ff:ff:ff:ff:ff:ff</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">5</span><span style="color:#f92672">:</span> <span style="color:#e6db74">vethf2772684@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">42:c1:fd:fe:42:e5 brd ff:ff:ff:ff:ff:ff link-netnsid 2</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">7</span><span style="color:#f92672">:</span> <span style="color:#e6db74">vethf314b245@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">52:2b:6e:1b:66:61 brd ff:ff:ff:ff:ff:ff link-netnsid 4</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">8</span><span style="color:#f92672">:</span> <span style="color:#e6db74">veth2cd71447@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">d2:e1:b3:06:8a:ed brd ff:ff:ff:ff:ff:ff link-netnsid 5</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">9</span><span style="color:#f92672">:</span> <span style="color:#e6db74">eth0@if10: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">10</span><span style="color:#f92672">:</span> <span style="color:#e6db74">veth86f7911b@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">be:4e:7b:f5:8c:12 brd ff:ff:ff:ff:ff:ff link-netnsid 1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">11</span><span style="color:#f92672">:</span> <span style="color:#e6db74">vethd2d58b32@if3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">f6:2a:73:93:e9:ca brd ff:ff:ff:ff:ff:ff link-netnsid 6</span>
+</span></span></code></pre></div><p>There are plenty of interfaces! We can probably guess now which do we want to check next.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">&gt;</span> <span style="color:#e6db74">ip -details link show flannel.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">flannel.1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">link/ether</span> <span style="color:#e6db74">12:c0:9a:88:11:82 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535 </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">vxlan</span> <span style="color:#e6db74">id 1 local 172.18.0.2 dev eth0 srcport 0 0 dstport 8472 nolearning ttl auto ageing 300 [...]</span>
+</span></span></code></pre></div><p>(I&rsquo;m cutting the output a little using <code>[...]</code>)</p>
 <p>Ah! There is our VXLAN interface. Now how does the traffic from <code>flannel.1</code> interface land in our <code>cni0</code> interface?</p>
 <p>According to information found in <a href="https://msazure.club/flannel-networking-demystify/">this amazing article</a> it is achieved by forwarding data using <code>iptables</code> from the bridge to the vxlan interface and vice versa.</p>
 <p>So in short, there are two interfaces - <code>flannel.1</code> which acts as virtual lan for our network of nodes, and <code>cni0</code> which acts as a bridge between containers and virtual lan.</p>
@@ -208,15 +208,15 @@ cni0		8000.b6a57ef61725	no		veth2cd71447
 <h3 id="multi-node-k3d-cluster">Multi-node k3d cluster</h3>
 <p>So far we have analyzed what is configured on a single-node setup and how flannel looks like from that perspective.</p>
 <p>I&rsquo;ve created another cluster with 3 nodes, to see how different the routing table is. And boy it is.</p>
-<pre tabindex="0"><code class="language-properties" data-lang="properties">&gt; route -n
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-0.0.0.0         172.19.0.1      0.0.0.0         UG    0      0        0 eth0
-10.42.0.0       10.42.0.0       255.255.255.0   UG    0      0        0 flannel.1
-10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0
-10.42.2.0       10.42.2.0       255.255.255.0   UG    0      0        0 flannel.1
-172.19.0.0      0.0.0.0         255.255.0.0     U     0      0        0 eth0
-</code></pre><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#a6e22e">&gt;</span> <span style="color:#e6db74">route -n</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Kernel</span> <span style="color:#e6db74">IP routing table</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Destination</span>     <span style="color:#e6db74">Gateway         Genmask         Flags Metric Ref    Use Iface</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">0.0.0.0</span>         <span style="color:#e6db74">172.19.0.1      0.0.0.0         UG    0      0        0 eth0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">10.42.0.0</span>       <span style="color:#e6db74">10.42.0.0       255.255.255.0   UG    0      0        0 flannel.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">10.42.1.0</span>       <span style="color:#e6db74">0.0.0.0         255.255.255.0   U     0      0        0 cni0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">10.42.2.0</span>       <span style="color:#e6db74">10.42.2.0       255.255.255.0   UG    0      0        0 flannel.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">172.19.0.0</span>      <span style="color:#e6db74">0.0.0.0         255.255.0.0     U     0      0        0 eth0</span>
+</span></span></code></pre></div><ul>
 <li>10.42.0.0, 10.42.1.0, 10.42.2.0 are all networks of nodes. For every new node we have a new route configured on every other node so that every node knows where to find each other.</li>
 <li>Containers are assigned IPs from the 10.42.N.0/24 range, that is from 10.42.N.1 through 10.42.N.254 Ips.</li>
 <li>We can spot an obvious limitation to that - we can only have at most 254 hosts on a single node.</li>
