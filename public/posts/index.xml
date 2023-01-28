@@ -27,7 +27,7 @@ I wanted to buy something cheap &amp;amp; reliable.</description>
       <description>Mind you, this is kind of a clickbaitish, but what I mean exactly is that traefik is too complicated for personal k3s setup.
 Trying to setup traefik from scratch I&amp;rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&amp;rsquo;s all nice and running and then there is this.
 I&amp;rsquo;ve created IngressRoute
-apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata:  labels:  app.kubernetes.io/managed-by: pulumi  name: dashboard  namespace: traefik-tailscale spec:  entryPoints:  - websecure  routes:  - kind: Rule  match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)  services:  - kind: TraefikService  name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).</description>
+apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: app.kubernetes.io/managed-by: pulumi name: dashboard namespace: traefik-tailscale spec: entryPoints: - websecure routes: - kind: Rule match: PathPrefix(`/dashboard`) || PathPrefix(`/api`) services: - kind: TraefikService name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).</description>
     </item>
     
     <item>
@@ -38,7 +38,7 @@ apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata:  labels:  
       <guid>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</guid>
       <description>This is gonna be rather short. I wanted to put all the info I gathered in a single place.
 Dockerfile There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.
- https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile  You need to modify it slightly however
+https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile You need to modify it slightly however
 Create file called entrypoint.sh (based on snippet)
 if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !</description>
     </item>
@@ -66,7 +66,7 @@ container network = host/node network
 If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to
 Like so:
 #1 Node 10.0.0.10
- #1 Server Container binds onto port 5432 #2 Client Container connects to 127.</description>
+#1 Server Container binds onto port 5432 #2 Client Container connects to 127.</description>
     </item>
     
     <item>
@@ -98,7 +98,7 @@ Infra automation not always the best way to move forward First of all, I don&amp
       <guid>https://flicksfix.com/posts/living-in-the-ide/</guid>
       <description>There are things that I enjoy when working as a professional. One of them is that when the tooling is so good that it just makes want to write the code. Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.
 An example of that you can find below
- Autocomplete works out of the box, no configuration needed   One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!</description>
+Autocomplete works out of the box, no configuration needed One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!</description>
     </item>
     
     <item>
@@ -117,8 +117,8 @@ An example of that you can find below
       
       <guid>https://flicksfix.com/posts/no-idea-where-to-live/</guid>
       <description>Intro For unfamiliar with Polish economy For the context of this post - I currently live by renting a flat in Warsaw, almost by the city border (Far end of Ursynów district). See the attached view for having a context
- Here is how it looks like   I&amp;rsquo;ve pretty close connection to metro line (which to say is impressive here as Warsaw has only two metro lines).
-Rent market !</description>
+Here is how it looks like I&amp;rsquo;ve pretty close connection to metro line (which to say is impressive here as Warsaw has only two metro lines).
+Rent market ! Disclaimer: I&amp;rsquo;m not an expert in real estate market - these numbers are pulled out of thin air according to my knowledge when I searched for flat recently.</description>
     </item>
     
     <item>
@@ -149,7 +149,7 @@ E: Failed to fetch store:/var/lib/apt/lists/partial/jp.archive.ubuntu.com_ubuntu
       
       <guid>https://flicksfix.com/posts/docker-swarm-cluster/</guid>
       <description>This is my first blog post about running anything related to home lab. As I have already done some work before to have Proxmox VE running with connection to the router — I will be explaining that in later posts if I find time or motivation to do so.
-Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes.</description>
+Planned: I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes. I will be using Ansible past the point when I have a fresh Ubuntu installed (installation will be manual, as this is really complicated to automate for the beginner) I will connect swarm nodes with docker swarm In the future:</description>
     </item>
     
   </channel>
