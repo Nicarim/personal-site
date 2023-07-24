@@ -11,9 +11,9 @@ Big fan of choosing technologies best suited for the problem, not the coolest.
 Always open to teach others about my work and share my knowledge.
 
 
-Main tools at my disposal: Python 3, Go, AWS, Bash, Kubernetes, AWS Lambda/Serverless, SQL. 
+Main tools at my disposal: Python 3, Go, AWS, GCP, Bash, Kubernetes, AWS Lambda/Serverless, SQL/RDS/CloudSQL. 
 
-# Professional Experience (7 years)
+# Professional Experience (8 years)
 
 {{< small "Sep 2021 - currently" >}}
 #### Platform Engineer, Stackerhq.com
