@@ -60,7 +60,7 @@ ZooKeeper
 - Optimizing for time efficiency scripts processing big amount of data
 - **Python 3.6, Docker, DigitalOcean, Ansible, Proxmox**
 
-{{< small May 2015 - Sep 2018 - 3 years 4 months" >}} 
+{{< small "May 2015 - Sep 2018 - 3 years 4 months" >}} 
 #### Tech Leader, Megacity sp. z o. o. / iMeshup
 - Architecture design of whole system
 - Leading the work of all developers inside the startup (2 frontend developers, 2 backend
