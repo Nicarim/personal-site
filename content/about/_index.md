@@ -17,18 +17,17 @@ Main tools at my disposal: Python 3, Go, AWS, Bash, Kubernetes, AWS Lambda/Serve
 
 {{< small "Sep 2021 - currently" >}}
 #### Platform Engineer, Stackerhq.com
-- Migrating platform to infrastructure as a code
-- Developing internal tooling to automate the deployment
 - Create environments as a service using ArgoCD and git
 - Advocate developers for best practicies around the infrastructure
-- Helping build scalable platform to be used by the customers. 
-
-{{< small "Jun 2021 - Jul 2021 - 2 months" >}}
-#### Site Reliability Engineer, Northern.Tech / Mender.io
-- Modernizing infrastructure from manual process (eksctl) to fully automated process (**terraform**)
-- Migrating from **terraform** to **terragrunt** for better management of environments
-- Implementing SSO for organization using **AWS SSO**
-- Delivering tooling for full site deployment automation
+- Helping build scalable platform to be used by the customers.
+- Transforming whole infrastructure to a reproducible and auditable Terraform based infrastructure as a code IaaC
+- Strengthening security perimeter, implementing Zero Trust architecture through Cloudflare ZT
+- Automating every day tasks, providing guidance through performance issues 
+- Migrating to modern CI/CD solutions such as Github Actions for ease of use and self-service
+- Responding to incidents and mitigating them, either by myself or with the team
+- Creating in-house solution for on-demand development environments to increase productivity and make features faster to develop
+- Cost optimization of infrastructure spending in cloud 
+- Preparing organization for ISO/SOC certification
 
 {{< small "Sep 2019 - Feb 2021 - 1 year 6 months" >}}
 #### Site Relability Engineer, Codility
@@ -54,14 +53,14 @@ business perspective
 - Technological Stack: **Python 3.7, Django 2.2, Celery, AWS (EC2, route53), Cloudflare, JMeter,
 Docker, Ansible, Gitlab CI**
 
-{{< small "Sep 2018 - Dec 2018 - 4 months" >}}
+{{< small "Sep 2018 - Dec 2018 - 4 months (contract)" >}}
 #### Software Developer, TogetherData
 - Working on big data solutions, using tools from Hadoop stack including: HDFS, Kafka, HBase,
 ZooKeeper
 - Optimizing for time efficiency scripts processing big amount of data
 - **Python 3.6, Docker, DigitalOcean, Ansible, Proxmox**
 
-{{< small "May 2016 - Sep 2018 - 2 years 4 months" >}} 
+{{< small May 2015 - Sep 2018 - 3 years 4 months" >}} 
 #### Tech Leader, Megacity sp. z o. o. / iMeshup
 - Architecture design of whole system
 - Leading the work of all developers inside the startup (2 frontend developers, 2 backend
@@ -83,7 +82,6 @@ business-friendly way.
 - Deploying services on client's infrastructure on request and providing documentation
 - **Continuation of cooperation form previous company (ThemTomatoez)**
 
-{{< small "May 2015 - May 2016 - 1 year" >}}
 #### Junior PHP Developer, ThemTomatoez
 - RESTful API for accessing resources.
 - Mobile authentication using both simple token, and OAuth2.0 flow.
