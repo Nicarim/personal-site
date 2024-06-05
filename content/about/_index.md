@@ -10,13 +10,19 @@ Focused on infrastructure automation, using tools like Ansible, Kubernetes, AWS.
 Big fan of choosing technologies best suited for the problem, not the coolest.
 Always open to teach others about my work and share my knowledge.
 
+Main tools at my disposal: Python 3, TypeScript, Go, AWS, GCP, Bash, Kubernetes, AWS Lambda/Serverless, SQL/RDS/CloudSQL. 
 
-Main tools at my disposal: Python 3, Go, AWS, GCP, Bash, Kubernetes, AWS Lambda/Serverless, SQL/RDS/CloudSQL. 
+# Professional Experience (9 years)
 
-# Professional Experience (8 years)
+{{< small "Nov 2023 - present" >}}
+#### Senior DevOps Engineer, Point72
+- Helping with major migration from BitBucket to Github Enterprise
+- Creating onborading documentation for potential customers of Github
+- Automation of migration process through TypeScript tooling and Github Hooks/Events
+- Improving documentaiton all around to provide with better clarity and understanding of offered solutions inside organization
 
-{{< small "Sep 2021 - currently" >}}
-#### Platform Engineer, Stackerhq.com
+{{< small "Sep 2021 - Sep 2023" >}}
+#### Senior Platform Engineer, Stackerhq.com
 - Create environments as a service using ArgoCD and git
 - Advocate developers for best practicies around the infrastructure
 - Helping build scalable platform to be used by the customers.
@@ -30,7 +36,7 @@ Main tools at my disposal: Python 3, Go, AWS, GCP, Bash, Kubernetes, AWS Lambda/
 - Preparing organization for ISO/SOC certification
 
 {{< small "Sep 2019 - Feb 2021 - 1 year 6 months" >}}
-#### Site Relability Engineer, Codility
+#### Senior SRE, Codility
 - Help with scalability of the system
 - Migrating old infrastructure created with fab scripts, chef and rake tasks to new Kubernetes
 - infrastructure (**Helm, Istio, Kubernetes, EKS**)
