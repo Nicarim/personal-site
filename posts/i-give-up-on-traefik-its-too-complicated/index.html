@@ -10,7 +10,7 @@
 Trying to setup traefik from scratch I&rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&rsquo;s all nice and running and then there is this.
 I&rsquo;ve created IngressRoute
 apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: app.kubernetes.io/managed-by: pulumi name: dashboard namespace: traefik-tailscale spec: entryPoints: - websecure routes: - kind: Rule match: PathPrefix(`/dashboard`) || PathPrefix(`/api`) services: - kind: TraefikService name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).">
-    <meta name="generator" content="Hugo 0.108.0">
+    <meta name="generator" content="Hugo 0.127.0">
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
