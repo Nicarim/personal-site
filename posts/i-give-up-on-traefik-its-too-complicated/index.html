@@ -10,7 +10,7 @@
 Trying to setup traefik from scratch I&rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&rsquo;s all nice and running and then there is this.
 I&rsquo;ve created IngressRoute
 apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: app.kubernetes.io/managed-by: pulumi name: dashboard namespace: traefik-tailscale spec: entryPoints: - websecure routes: - kind: Rule match: PathPrefix(`/dashboard`) || PathPrefix(`/api`) services: - kind: TraefikService name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).">
-    <meta name="generator" content="Hugo 0.127.0">
+    <meta name="generator" content="Hugo 0.92.2" />
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -77,23 +77,23 @@ apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: ap
 <h2 id="trying-to-setup-traefik-from-scratch">Trying to setup traefik from scratch</h2>
 <p>I&rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&rsquo;s all nice and running and then there is this.</p>
 <p>I&rsquo;ve created IngressRoute</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">IngressRoute</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/managed-by</span>: <span style="color:#ae81ff">pulumi</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dashboard</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">traefik-tailscale</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">entryPoints</span>:
-</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">websecure</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">routes</span>:
-</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Rule</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">match</span>: <span style="color:#ae81ff">PathPrefix(`/dashboard`) || PathPrefix(`/api`)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">services</span>:
-</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TraefikService</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">api@internal</span>
-</span></span></code></pre></div><p>Which does what it says - matches <code>/dashboard</code> and directs that to internal api which resolves to showing a dashboard when you access <code>/dashboard/</code> (mind the slash).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">IngressRoute</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app.kubernetes.io/managed-by</span>: <span style="color:#ae81ff">pulumi</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dashboard</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">traefik-tailscale</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">entryPoints</span>:
+  - <span style="color:#ae81ff">websecure</span>
+  <span style="color:#f92672">routes</span>:
+  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Rule</span>
+    <span style="color:#f92672">match</span>: <span style="color:#ae81ff">PathPrefix(`/dashboard`) || PathPrefix(`/api`)</span>
+    <span style="color:#f92672">services</span>:
+    - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TraefikService</span>
+      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">api@internal</span>
+</code></pre></div><p>Which does what it says - matches <code>/dashboard</code> and directs that to internal api which resolves to showing a dashboard when you access <code>/dashboard/</code> (mind the slash).</p>
 <p>Now I&rsquo;ve made port-forward from traefik&rsquo;s websecure port to a localhost:9100, and I accessed the path at <code>https://localhost:9100/</code> viola.</p>
 <p>It works</p>
 <p>EXCEPT&hellip;</p>

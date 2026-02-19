@@ -7,7 +7,7 @@
     <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/</loc>
-    <lastmod>2022-04-10T17:58:03+02:00</lastmod>
+    <lastmod>2026-02-19T11:00:00+02:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -20,12 +20,17 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</loc>
-    <lastmod>2022-04-10T17:58:03+02:00</lastmod>
+    <loc>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</loc>
+    <lastmod>2026-02-19T11:00:00+02:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/</loc>
+    <lastmod>2026-02-19T11:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</loc>
     <lastmod>2022-04-10T17:58:03+02:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

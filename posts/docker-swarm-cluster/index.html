@@ -7,8 +7,8 @@
     <title>Docker swarm cluster on single laptop home lab running Proxmox VE | Writing about code, electronics and other stuff</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="This is my first blog post about running anything related to home lab. As I have already done some work before to have Proxmox VE running with connection to the router — I will be explaining that in later posts if I find time or motivation to do so.
-Planned: I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes. I will be using Ansible past the point when I have a fresh Ubuntu installed (installation will be manual, as this is really complicated to automate for the beginner) I will connect swarm nodes with docker swarm In the future:">
-    <meta name="generator" content="Hugo 0.127.0">
+Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes.">
+    <meta name="generator" content="Hugo 0.92.2" />
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -236,7 +236,7 @@ Installing docker is no tricky job so we can use a great <a href="https://galaxy
 this is where roles that we install through <code>ansible-galaxy</code> will be stored and read from.</p>
 <p>To install the role:</p>
 <pre tabindex="0"><code>$ ansible-galaxy install geerlingguy.docker
-- downloading role &#39;docker&#39;, owned by geerlingguy  
+- downloading role 'docker', owned by geerlingguy  
 - downloading role from [https://github.com/geerlingguy/ansible-role-docker/archive/2.6.0.tar.gz](https://github.com/geerlingguy/ansible-role-docker/archive/2.6.0.tar.gz)  
 - extracting geerlingguy.docker to /home/gordonryzen/Projects/homelab-project/ansible-playbooks/roles/geerlingguy.docker  
 - geerlingguy.docker (2.6.0) was installed successfully
@@ -268,9 +268,9 @@ There is also mysterious <code>become: yes</code> which basically means that the
   
 PLAY [pvevm-nodes] *************************************************************************************
 TASK [Gathering Facts] *********************************************************************************  
-fatal: [pvevm-eukithorblackwood-node]: FAILED! =&gt; {&#34;msg&#34;: &#34;Missing sudo password&#34;}  
-fatal: [pvevm-mordenwinter-node]: FAILED! =&gt; {&#34;msg&#34;: &#34;Missing sudo password&#34;}  
-fatal: [pvevm-coltontrevil-node]: FAILED! =&gt; {&#34;msg&#34;: &#34;Missing sudo password&#34;}
+fatal: [pvevm-eukithorblackwood-node]: FAILED! =&gt; {&quot;msg&quot;: &quot;Missing sudo password&quot;}  
+fatal: [pvevm-mordenwinter-node]: FAILED! =&gt; {&quot;msg&quot;: &quot;Missing sudo password&quot;}  
+fatal: [pvevm-coltontrevil-node]: FAILED! =&gt; {&quot;msg&quot;: &quot;Missing sudo password&quot;}
 </code></pre><p>And we approach <strong>first issue</strong> — it seems we cannot use sudo without providing password by default.
 There are two ways to solve this — one is to use <code>-K</code> when calling playbook — this way we can provide password,
 or create a role which removes the need for using password when using sudo.
@@ -287,8 +287,8 @@ Create a structure like this in your <code>roles</code> directory:</p>
 - name: Ensure sudo can be ran without password  
   lineinfile:  
     path: /etc/sudoers  
-    regexp: &#34;^{{user}} &#34;  
-    line: &#34;{{user}} ALL=(ALL) NOPASSWD:ALL&#34;  
+    regexp: &quot;^{{user}} &quot;  
+    line: &quot;{{user}} ALL=(ALL) NOPASSWD:ALL&quot;  
     backup: yes
 </code></pre><p>To explain what happened here, have <a href="https://docs.ansible.com/ansible/latest/modules/lineinfile_module.html">documentation for lineinfile</a> open side by side:</p>
 <ul>
@@ -354,20 +354,20 @@ ok: [pvevm-coltontrevil-node]
 ok: [pvevm-mordenwinter-node]
 [......]
 TASK [geerlingguy.docker : Add Docker repository.] *****************************************************  
-fatal: [pvevm-mordenwinter-node]: FAILED! =&gt; {&#34;changed&#34;: false, &#34;msg&#34;: &#34;apt cache update failed&#34;}  
-fatal: [pvevm-coltontrevil-node]: FAILED! =&gt; {&#34;changed&#34;: false, &#34;msg&#34;: &#34;apt cache update failed&#34;}  
-fatal: [pvevm-eukithorblackwood-node]: FAILED! =&gt; {&#34;changed&#34;: false, &#34;msg&#34;: &#34;apt cache update failed&#34;}
+fatal: [pvevm-mordenwinter-node]: FAILED! =&gt; {&quot;changed&quot;: false, &quot;msg&quot;: &quot;apt cache update failed&quot;}  
+fatal: [pvevm-coltontrevil-node]: FAILED! =&gt; {&quot;changed&quot;: false, &quot;msg&quot;: &quot;apt cache update failed&quot;}  
+fatal: [pvevm-eukithorblackwood-node]: FAILED! =&gt; {&quot;changed&quot;: false, &quot;msg&quot;: &quot;apt cache update failed&quot;}
 </code></pre><p>Another issue occurred, this time we just get some error which tells us nothing,
 but we can rerun the playbook with <code>-vvv</code> to get more output to narrow down the problem
 (<strong>be warned:</strong> this will throw lots of data on the screen)</p>
 <pre tabindex="0"><code>[....]
-&#34;invocation&#34;: {  
-        &#34;module_args&#34;: {  
-            &#34;codename&#34;: null,  
-            &#34;filename&#34;: null,  
-            &#34;install_python_apt&#34;: true,  
-            &#34;mode&#34;: null,  
-            &#34;repo&#34;: &#34;deb [arch=amd64] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) eoan stable&#34;,  
+&quot;invocation&quot;: {  
+        &quot;module_args&quot;: {  
+            &quot;codename&quot;: null,  
+            &quot;filename&quot;: null,  
+            &quot;install_python_apt&quot;: true,  
+            &quot;mode&quot;: null,  
+            &quot;repo&quot;: &quot;deb [arch=amd64] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) eoan stable&quot;,  
 [....]
 </code></pre><p>Looks like it errors on adding docker apt repository, <a href="https://github.com/docker/for-linux/issues/833">quick google</a>
 tells that this is a common issue because we choose to go with newest available Ubuntu (19.10) which is not yet supported.
@@ -375,7 +375,7 @@ Another link provided in <a href="https://stackoverflow.com/questions/45023363/w
 And I said I wanted to go easy route huh?</p>
 <p>The simplest solution here is to just force our role to use disco (19.04) packages instead for docker, and that’s what we’re going to do.</p>
 <p>We can see in <code>galaxy-roles/geerlingguy.docker/defaults/main.yml</code> that the apt path is provided as follows:</p>
-<pre tabindex="0"><code>docker_apt_repository: &#34;deb [arch={{ docker_apt_arch }}] [https://download.docker.com/linux/{{](https://download.docker.com/linux/{{) ansible_distribution|lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}&#34;
+<pre tabindex="0"><code>docker_apt_repository: &quot;deb [arch={{ docker_apt_arch }}] [https://download.docker.com/linux/{{](https://download.docker.com/linux/{{) ansible_distribution|lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}&quot;
 </code></pre><p>We can just replace <code>ansible_distribution_release</code> for this role to be something else,
 for that we can just provide another var for a role where we set this to <code>disco</code> .</p>
 <pre tabindex="0"><code>---  
@@ -387,7 +387,7 @@ for that we can just provide another var for a role where we set this to <code>d
         user: marcing  
     - role: geerlingguy.docker  
       vars:  
-        ansible_distribution_release: &#34;disco&#34;  
+        ansible_distribution_release: &quot;disco&quot;  
         docker_users:  
           - marcing
 </code></pre><p>Running this again makes it look like we solved the issue and installation continued. By the end we should get information similar to this:</p>
@@ -396,7 +396,7 @@ pvevm-coltontrevil-node    : ok=15   changed=5    unreachable=0    failed=0    s
 pvevm-eukithorblackwood-node : ok=15   changed=5    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0     
 pvevm-mordenwinter-node    : ok=15   changed=5    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0
 </code></pre><p>No failed tasks mean it worked correctly. To see if docker works correctly we can call on each host a hello world command:</p>
-<pre tabindex="0"><code>$ ansible pvevm-nodes -a &#34;docker run hello-world&#34;
+<pre tabindex="0"><code>$ ansible pvevm-nodes -a &quot;docker run hello-world&quot;
 
 pvevm-coltontrevil-node | CHANGED | rc=0 &gt;&gt;Hello from Docker!  
 ...
@@ -445,11 +445,11 @@ We will be doing following schema</p>
 - name: Run manager tasks  
   include_tasks: manager-tasks.yaml  
   run_once: yes  
-  loop: &#34;{{ groups[manager_nodes] }}&#34;
+  loop: &quot;{{ groups[manager_nodes] }}&quot;
 - name: Run worker tasks  
   include_tasks: worker-tasks.yaml  
   run_once: yes  
-  loop: &#34;{{ groups[worker_nodes] }}&#34;
+  loop: &quot;{{ groups[worker_nodes] }}&quot;
 </code></pre><p>This is looping through two variables that are provided externally — <code>manager_nodes</code> and <code>worker_nodes</code>.</p>
 <ul>
 <li><code>run_once: yes</code> makes a single task for a given loop iteration be ran only once for the first server.
@@ -459,25 +459,25 @@ In our case <code>worker_nodes=pvevm-nodes-workers</code> and <code>manager_node
 </ul>
 <h2 id="creating-a-leader">Creating a leader</h2>
 <p>Creating a leader is placed within <code>manager-tasks.yaml</code>, with the following content</p>
-<pre tabindex="0"><code>- name: &#34;Set facts&#34;  
+<pre tabindex="0"><code>- name: &quot;Set facts&quot;  
   set_fact:  
-    advertise_addr: &#39;{{ hostvars[item][&#34;ansible_default_ipv4&#34;][&#34;address&#34;] }}&#39;
-- name: &#34;Check if leader was already elected&#34;  
-  delegate_to: &#34;{{item}}&#34;  
+    advertise_addr: '{{ hostvars[item][&quot;ansible_default_ipv4&quot;][&quot;address&quot;] }}'
+- name: &quot;Check if leader was already elected&quot;  
+  delegate_to: &quot;{{item}}&quot;  
   command: docker info  
   register: docker_info
-- name: &#34;Make selected node a leader&#34;  
-  delegate_to: &#34;{{item}}&#34;  
+- name: &quot;Make selected node a leader&quot;  
+  delegate_to: &quot;{{item}}&quot;  
   delegate_facts: yes  
   command: docker swarm init --advertise-addr {{ advertise_addr }} --listen-addr {{ advertise_addr }}  
-  when: &#39;docker_info.stdout is not search(&#34;Is Manager: true&#34;)&#39;
-- name: &#34;Get worker join token&#34;  
-  delegate_to: &#34;{{item}}&#34;  
+  when: 'docker_info.stdout is not search(&quot;Is Manager: true&quot;)'
+- name: &quot;Get worker join token&quot;  
+  delegate_to: &quot;{{item}}&quot;  
   delegate_facts: yes  
   command: docker swarm join-token worker -q  
-  register: worker_join_token- name: &#34;Set worker join token fact&#34;  
+  register: worker_join_token- name: &quot;Set worker join token fact&quot;  
   set_fact:  
-    worker_join_token: &#34;{{worker_join_token.stdout}}&#34;
+    worker_join_token: &quot;{{worker_join_token.stdout}}&quot;
 </code></pre><p>First action is to just assign an address of leader to the shorter variable name.
 This hack was needed instead of just using <code>ansible_default_ipv4</code> because when delegating,
 this variable is actually equal to machine on which behalf we delegated the task for, and not of which machine it was actually running.</p>
@@ -487,17 +487,17 @@ and we get the token using <code>-q</code> flag so we get pure token in <code>wo
 We then assign it as a global fact to be used in second set of tasks.</p>
 <h2 id="joining-workers">Joining workers</h2>
 <p>This one is really simple <code>worker-tasks.yaml</code></p>
-<pre tabindex="0"><code>- name: &#34;Set facts about join address&#34;  
+<pre tabindex="0"><code>- name: &quot;Set facts about join address&quot;  
   set_fact:  
-    join_address: &#39;{{hostvars[groups[manager_nodes].0][&#34;ansible_default_ipv4&#34;][&#34;address&#34;]}}&#39;
-- name: &#34;Check if workers are already part of swarm&#34;  
-  delegate_to: &#34;{{ item }}&#34;  
+    join_address: '{{hostvars[groups[manager_nodes].0][&quot;ansible_default_ipv4&quot;][&quot;address&quot;]}}'
+- name: &quot;Check if workers are already part of swarm&quot;  
+  delegate_to: &quot;{{ item }}&quot;  
   command: docker info  
   register: docker_info_worker
-- name: &#34;Join workers&#34;  
-  delegate_to: &#34;{{ item }}&#34;  
+- name: &quot;Join workers&quot;  
+  delegate_to: &quot;{{ item }}&quot;  
   command: docker swarm join --token {{worker_join_token}} {{join_address}}  
-  when: &#39;docker_info_worker.stdout is not search(&#34;Swarm: active&#34;)&#39;
+  when: 'docker_info_worker.stdout is not search(&quot;Swarm: active&quot;)'
 </code></pre><p>In the first step I set <code>join_address</code> as an alias to first ipv4 address of the manager_nodes.
 I know it is plural, but I use it as singular anyway here. Don’t burn me yet for this.</p>
 <p>We also again pull the info from <code>docker info</code> about the state of the node, because we cannot join it twice to same cluster,
