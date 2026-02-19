@@ -6,7 +6,17 @@
     <description>Recent content in Blog on Writing about code, electronics and other stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 10 Apr 2022 17:58:03 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 19 Feb 2026 11:00:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LLM told me to do so - navigating my career in the age of AI</title>
+      <link>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</link>
+      <pubDate>Thu, 19 Feb 2026 11:00:00 +0200</pubDate>
+      
+      <guid>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</guid>
+      <description>Something that has been bothering me for a while and I&amp;rsquo;d really like to put it in writing.
+I believe that LLM based AI is going to negatively impact an ability for a person to become an expert at anything. As an effect of that, a negative feedback loop is going to form where AI will become dumber and dumber. You can&amp;rsquo;t have LLM learn more and yet destroy the whole incentive for learning anything.</description>
+    </item>
+    
     <item>
       <title>Contributing to Openwrt for the first time TP-Link RE650 V2</title>
       <link>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</link>
@@ -38,7 +48,7 @@ apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: ap
       <guid>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</guid>
       <description>This is gonna be rather short. I wanted to put all the info I gathered in a single place.
 Dockerfile There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.
-https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile You need to modify it slightly however
+ https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile  You need to modify it slightly however
 Create file called entrypoint.sh (based on snippet)
 if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !</description>
     </item>
@@ -66,7 +76,7 @@ container network = host/node network
 If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to
 Like so:
 #1 Node 10.0.0.10
-#1 Server Container binds onto port 5432 #2 Client Container connects to 127.</description>
+ #1 Server Container binds onto port 5432 #2 Client Container connects to 127.</description>
     </item>
     
     <item>
@@ -98,7 +108,7 @@ Infra automation not always the best way to move forward First of all, I don&amp
       <guid>https://flicksfix.com/posts/living-in-the-ide/</guid>
       <description>There are things that I enjoy when working as a professional. One of them is that when the tooling is so good that it just makes want to write the code. Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.
 An example of that you can find below
-Autocomplete works out of the box, no configuration needed One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!</description>
+ Autocomplete works out of the box, no configuration needed   One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!</description>
     </item>
     
     <item>
@@ -117,8 +127,8 @@ Autocomplete works out of the box, no configuration needed One might say &amp;ld
       
       <guid>https://flicksfix.com/posts/no-idea-where-to-live/</guid>
       <description>Intro For unfamiliar with Polish economy For the context of this post - I currently live by renting a flat in Warsaw, almost by the city border (Far end of Ursynów district). See the attached view for having a context
-Here is how it looks like I&amp;rsquo;ve pretty close connection to metro line (which to say is impressive here as Warsaw has only two metro lines).
-Rent market ! Disclaimer: I&amp;rsquo;m not an expert in real estate market - these numbers are pulled out of thin air according to my knowledge when I searched for flat recently.</description>
+ Here is how it looks like   I&amp;rsquo;ve pretty close connection to metro line (which to say is impressive here as Warsaw has only two metro lines).
+Rent market !</description>
     </item>
     
     <item>
@@ -149,7 +159,7 @@ E: Failed to fetch store:/var/lib/apt/lists/partial/jp.archive.ubuntu.com_ubuntu
       
       <guid>https://flicksfix.com/posts/docker-swarm-cluster/</guid>
       <description>This is my first blog post about running anything related to home lab. As I have already done some work before to have Proxmox VE running with connection to the router — I will be explaining that in later posts if I find time or motivation to do so.
-Planned: I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes. I will be using Ansible past the point when I have a fresh Ubuntu installed (installation will be manual, as this is really complicated to automate for the beginner) I will connect swarm nodes with docker swarm In the future:</description>
+Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes.</description>
     </item>
     
   </channel>

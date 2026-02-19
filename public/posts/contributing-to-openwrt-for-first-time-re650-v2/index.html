@@ -9,7 +9,7 @@
     <meta name="description" content="Buying a new AP to cover more space So I recently moved to a new flat. This was a significant upgrade for me, since before I was living in almost 40m2 and a single AP was enough.
 However, once I moved to almost 80m2 - it turns out single AP cannot cover 5GHz for the whole flat, so I had to buy another one.
 I wanted to buy something cheap &amp; reliable.">
-    <meta name="generator" content="Hugo 0.127.0">
+    <meta name="generator" content="Hugo 0.92.2" />
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -162,7 +162,7 @@ and I could reconnect it back on once it&rsquo;s booted. RX is used to recieve c
 from my computer, so I could still see everything since I had TX still connected.</p>
 <p>I&rsquo;ve used picocom with the command <code>picocom -b 57600 /dev/ttyUSB0</code></p>
 <p>Before my eyes unleashed everything the device wanted to tell me.</p>
-<div style="height: 500px; overflow: auto"><script src="https://gist.github.com/Nicarim/17fdcd8848b02d2f56adaba29c2d2022.js"></script>
+<div style="height: 500px; overflow: auto"><script type="application/javascript" src="https://gist.github.com/Nicarim/17fdcd8848b02d2f56adaba29c2d2022.js"></script>
 </div>
 <h3 id="getting-root-access">Getting root access</h3>
 <p>Well, this could&rsquo;ve been a story about how my advanced hacking skills allowed me
@@ -179,13 +179,13 @@ To list available &ldquo;partitions&rdquo;, you have to run <code>cat /proc/mtd<
 <p>You&rsquo;ll get output similar to this one:</p>
 <pre tabindex="0"><code># cat /proc/mtd
 dev:    size   erasesize  name
-mtd0: 00020000 00010000 &#34;u-boot&#34;
-mtd1: 007a0000 00010000 &#34;firmware&#34;
-mtd2: 002455dc 00010000 &#34;kernel&#34;
-mtd3: 0055aa24 00010000 &#34;rootfs&#34;
-mtd4: 001c0000 00010000 &#34;rootfs_data&#34;
-mtd5: 0002d440 00010000 &#34;config&#34;
-mtd6: 00010000 00010000 &#34;radio&#34;
+mtd0: 00020000 00010000 &quot;u-boot&quot;
+mtd1: 007a0000 00010000 &quot;firmware&quot;
+mtd2: 002455dc 00010000 &quot;kernel&quot;
+mtd3: 0055aa24 00010000 &quot;rootfs&quot;
+mtd4: 001c0000 00010000 &quot;rootfs_data&quot;
+mtd5: 0002d440 00010000 &quot;config&quot;
+mtd6: 00010000 00010000 &quot;radio&quot;
 </code></pre><p>However, there is no guarantee that they&rsquo;re not overlapping each other..
 There could be (and it is a case here as well) that the kernel is inside of firmware
 partition, or part of it.</p>
