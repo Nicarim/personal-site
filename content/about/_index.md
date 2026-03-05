@@ -5,16 +5,30 @@ weight: 1
 {{< print >}}
 # About Me
 
-I'm Marcin Gordziejewski, Software Engineer, DevOps, SRE. Based in Warsaw, Poland. 
+I'm Marcin Komsta, Software Engineer, DevOps, SRE, Cloud Platform Engineer. Based in Warsaw, Poland.
 Focused on infrastructure automation, using tools like Ansible, Kubernetes, AWS. 
 Big fan of choosing technologies best suited for the problem, not the coolest.
 Always open to teach others about my work and share my knowledge.
+In the past I used to be a Software Engineer, transitioned into infrastructure / operations roles to utilize my diverse engineering background.
+Generalist with infrastructure focus.
 
 Main tools at my disposal: Python 3, TypeScript, Go, AWS, GCP, Bash, Kubernetes, AWS Lambda/Serverless, SQL/RDS/CloudSQL. 
 
-# Professional Experience (9 years)
+# Professional Experience (11 years)
 
-{{< small "Nov 2023 - present" >}}
+{{< small "Oct 2024 - present" >}}
+#### Senior Cloud Platform Engineer, Clari
+- Drive migration of around 50 services from legacy Chef based deployment to modern Kubernetes/Istio/FluxCD based deployment
+- Modernize and speed up development speed within infrastructure
+- Managing infrastructure scalability
+- Aid development teams with infrastructure decisions
+- Collaborate on implementing the infrastructure changes
+- Create tooling needed to support on-going maintenance within the GitOps repositories
+- Be part of On-call rota
+- Automation in Go, TypeScript, Python
+- Stack: AWS, Java, Kubernetes EKS, Chef, FluxCD, GitOps, Github/Github Actions
+
+{{< small "Nov 2023 - Sep 2024" >}}
 #### Senior DevOps Engineer, Point72
 - Helping with major migration from BitBucket to Github Enterprise
 - Creating onborading documentation for potential customers of Github
@@ -96,10 +110,8 @@ business-friendly way.
 - Facebook API and Google Maps API
 
 # Other skills
-- Simple circuit design using **KiCad**
-- **Basic** electronics diagnostic and repair using **Microscope, DMM, Oscilloscope, soldering iron, hot air gun**
+- Circuit design using **KiCad**
+- Electronics diagnostic and repair using **Microscope, DMM, Oscilloscope, soldering iron, hot air gun**
 - **CNC/3D Printer** enthusiast, programming and compiling 3D printing controllers
-- Trying my best to make good documentation with the least amount of words 
-  - Achieving that using automation / semantics where possible
 - Candidate screening and recruitment
 - Good knowledge of SQL databases (**PostgreSQL, MySQL**)
