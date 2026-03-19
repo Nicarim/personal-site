@@ -4,235 +4,170 @@
     <title>Writing about code, electronics and other stuff</title>
     <link>https://flicksfix.com/</link>
     <description>Recent content on Writing about code, electronics and other stuff</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 19 Feb 2026 11:00:00 +0200</lastBuildDate><atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 19 Mar 2026 10:00:00 +0200</lastBuildDate>
+    <atom:link href="https://flicksfix.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How to rotate Istio TLS certificates without downtime in ambient mode</title>
+      <link>https://flicksfix.com/posts/how-to-rotate-istio-ca-cert/</link>
+      <pubDate>Thu, 19 Mar 2026 10:00:00 +0200</pubDate>
+      <guid>https://flicksfix.com/posts/how-to-rotate-istio-ca-cert/</guid>
+      <description>&lt;p&gt;This is rather short note on how to do the certification rotation, as official istio documentation is really sparse on details.&lt;/p&gt;&#xA;&lt;p&gt;This has been tested on Istio 1.28.1, in Kind cluster, running ambient mode with ztunnel and waypoints.&lt;/p&gt;&#xA;&lt;p&gt;Issue I&amp;rsquo;ve been facing was that whenever I tried to replace the CA Certificates used by istio, Istio Waypoints were unable to communicate with Istio Ztunnel.&lt;/p&gt;&#xA;&lt;p&gt;It turns out that istio has two options that has to be enabled to make the transition seamless, and you also need to know how to properly modify the certificate chain that you&amp;rsquo;re providing.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>LLM told me to do so - navigating my career in the age of AI</title>
       <link>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</link>
       <pubDate>Thu, 19 Feb 2026 11:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</guid>
-      <description>Something that has been bothering me for a while and I&amp;rsquo;d really like to put it in writing.
-I believe that LLM based AI is going to negatively impact an ability for a person to become an expert at anything. As an effect of that, a negative feedback loop is going to form where AI will become dumber and dumber. You can&amp;rsquo;t have LLM learn more and yet destroy the whole incentive for learning anything.</description>
+      <description>&lt;p&gt;Something that has been bothering me for a while and I&amp;rsquo;d really like to put it in writing.&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;I believe that LLM based AI is going to negatively impact an ability for a person to become an expert at anything.&lt;/strong&gt;&#xA;As an effect of that, a negative feedback loop is going to form where AI will become dumber and dumber.&#xA;You can&amp;rsquo;t have LLM learn more and yet destroy the whole incentive for learning anything.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Contributing to Openwrt for the first time TP-Link RE650 V2</title>
       <link>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</link>
       <pubDate>Sun, 10 Apr 2022 17:58:03 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/contributing-to-openwrt-for-first-time-re650-v2/</guid>
-      <description>Buying a new AP to cover more space So I recently moved to a new flat. This was a significant upgrade for me, since before I was living in almost 40m2 and a single AP was enough.
-However, once I moved to almost 80m2 - it turns out single AP cannot cover 5GHz for the whole flat, so I had to buy another one.
-I wanted to buy something cheap &amp;amp; reliable.</description>
+      <description>&lt;h2 id=&#34;buying-a-new-ap-to-cover-more-space&#34;&gt;Buying a new AP to cover more space&lt;/h2&gt;&#xA;&lt;p&gt;So I recently moved to a new flat. This was a significant upgrade for me,&#xA;since before I was living in almost 40m&lt;sup&gt;2&lt;/sup&gt; and a single AP was enough.&lt;/p&gt;&#xA;&lt;p&gt;However, once I moved to almost 80m&lt;sup&gt;2&lt;/sup&gt; - it turns out single AP cannot&#xA;cover 5GHz for the whole flat, so I had to buy another one.&lt;/p&gt;&#xA;&lt;p&gt;I wanted to buy something cheap &amp;amp; reliable. I came across TP-Link RE650&#xA;recommendation somewhere on the internet, it was quite cheap and promised&#xA;high speed so I said why not.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>I Give Up on Traefik Its Too Complicated</title>
       <link>https://flicksfix.com/posts/i-give-up-on-traefik-its-too-complicated/</link>
       <pubDate>Fri, 03 Sep 2021 22:49:50 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/i-give-up-on-traefik-its-too-complicated/</guid>
-      <description>Mind you, this is kind of a clickbaitish, but what I mean exactly is that traefik is too complicated for personal k3s setup.
-Trying to setup traefik from scratch I&amp;rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&amp;rsquo;s all nice and running and then there is this.
-I&amp;rsquo;ve created IngressRoute
-apiVersion: traefik.containo.us/v1alpha1 kind: IngressRoute metadata: labels: app.kubernetes.io/managed-by: pulumi name: dashboard namespace: traefik-tailscale spec: entryPoints: - websecure routes: - kind: Rule match: PathPrefix(`/dashboard`) || PathPrefix(`/api`) services: - kind: TraefikService name: api@internal Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).</description>
+      <description>&lt;p&gt;Mind you, this is kind of a clickbaitish, but what I mean exactly is that traefik is too complicated for personal k3s setup.&lt;/p&gt;&#xA;&lt;h2 id=&#34;trying-to-setup-traefik-from-scratch&#34;&gt;Trying to setup traefik from scratch&lt;/h2&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&amp;rsquo;s all nice and running and then there is this.&lt;/p&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve created IngressRoute&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;apiVersion&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;traefik.containo.us/v1alpha1&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;kind&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;IngressRoute&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;metadata&lt;/span&gt;:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;labels&lt;/span&gt;:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;app.kubernetes.io/managed-by&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;pulumi&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;dashboard&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;namespace&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;traefik-tailscale&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;spec&lt;/span&gt;:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;entryPoints&lt;/span&gt;:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  - &lt;span style=&#34;color:#ae81ff&#34;&gt;websecure&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;routes&lt;/span&gt;:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  - &lt;span style=&#34;color:#f92672&#34;&gt;kind&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;Rule&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;match&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;PathPrefix(`/dashboard`) || PathPrefix(`/api`)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;services&lt;/span&gt;:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - &lt;span style=&#34;color:#f92672&#34;&gt;kind&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;TraefikService&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;name&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;api@internal&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Which does what it says - matches &lt;code&gt;/dashboard&lt;/code&gt; and directs that to internal api which resolves to showing a dashboard when you access &lt;code&gt;/dashboard/&lt;/code&gt; (mind the slash).&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Deploying Tailscale Vpn on K3s Kubernetes</title>
       <link>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</link>
       <pubDate>Thu, 02 Sep 2021 22:18:52 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/deploying-tailscale-vpn-on-k3s-kubernetes/</guid>
-      <description>This is gonna be rather short. I wanted to put all the info I gathered in a single place.
-Dockerfile There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.
- https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile  You need to modify it slightly however
-Create file called entrypoint.sh (based on snippet)
-if [ ! -d /dev/net ]; then mkdir /dev/net; fi if [ !</description>
+      <description>&lt;p&gt;This is gonna be rather short. I wanted to put all the info I gathered in a single place.&lt;/p&gt;&#xA;&lt;h2 id=&#34;dockerfile&#34;&gt;Dockerfile&lt;/h2&gt;&#xA;&lt;p&gt;There is no official docker image available yet. There is however official Dockerfile which you can use to base your setup off of.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile&#34;&gt;https://github.com/tailscale/tailscale/blob/v1.14.0/Dockerfile&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;You need to modify it slightly however&lt;/p&gt;&#xA;&lt;p&gt;Create file called &lt;code&gt;entrypoint.sh&lt;/code&gt; (based on &lt;a href=&#34;https://gist.github.com/hamishforbes/2ac7ae9d7ea47cad4e3a813c9b45c10f&#34;&gt;snippet&lt;/a&gt;)&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt; ! -d /dev/net &lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;; &lt;span style=&#34;color:#66d9ef&#34;&gt;then&lt;/span&gt; mkdir /dev/net; &lt;span style=&#34;color:#66d9ef&#34;&gt;fi&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt; ! -e /dev/net/tun &lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;; &lt;span style=&#34;color:#66d9ef&#34;&gt;then&lt;/span&gt;  mknod /dev/net/tun c &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt; 200; &lt;span style=&#34;color:#66d9ef&#34;&gt;fi&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Wait 5s for the daemon to start and then run tailscale up to configure&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/bin/sh -c &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;sleep 5; tailscale up --authkey=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;${&lt;/span&gt;TAILSCALE_AUTH&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; -advertise-tags=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;${&lt;/span&gt;TAILSCALE_TAGS&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt; &amp;amp;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exec /usr/local/bin/tailscaled --state&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/tailscale/tailscaled.state&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And put it into the same dir you have tailscale Dockerfile. You need to add that entrypoint to Dockerfile and use it:&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Using Pulumi as Helm Alternative for Templating</title>
       <link>https://flicksfix.com/posts/using-pulumi-as-helm-alternative-for-templating/</link>
       <pubDate>Thu, 02 Sep 2021 14:23:03 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/using-pulumi-as-helm-alternative-for-templating/</guid>
-      <description>I hate Helm I truly hate helm. It&amp;rsquo;s not because it&amp;rsquo;s a bad idea, core idea of Helm does actually solve a problem that you often meet with deploying manifest (customization). It&amp;rsquo;s not because I don&amp;rsquo;t know how to use it - I used it to create many deployments and I truly appreciate its existence.
-But I hate it to the heart.
-Why you might ask?
-It&amp;rsquo;s because most of the time Helm tends to become total customization of the chart.</description>
+      <description>&lt;h1 id=&#34;i-hate-helm&#34;&gt;I hate Helm&lt;/h1&gt;&#xA;&lt;p&gt;I truly hate helm. It&amp;rsquo;s not because it&amp;rsquo;s a bad idea, core idea of Helm does actually solve a problem that you often meet with deploying manifest (customization). It&amp;rsquo;s not because I don&amp;rsquo;t know how to use it - I used it to create many deployments and I truly appreciate its existence.&lt;/p&gt;&#xA;&lt;p&gt;But I hate it to the heart.&lt;/p&gt;&#xA;&lt;p&gt;Why you might ask?&lt;/p&gt;&#xA;&lt;p&gt;It&amp;rsquo;s because most of the time Helm tends to become total customization of the chart. Literally. If you try to use any off the shelf helm charts you will often meet with following dilemma:&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Understanding Flannel Networking in K3s</title>
       <link>https://flicksfix.com/posts/understanding-flannel-networking-in-k3s/</link>
       <pubDate>Wed, 01 Sep 2021 17:07:44 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/understanding-flannel-networking-in-k3s/</guid>
-      <description>How does it work without Flannel Assumption: I&amp;rsquo;m using host networking through these examples. You could utilize docker network for example, but to make it simple I wanted to stick to the fact below
-container network = host/node network
-If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to
-Like so:
-#1 Node 10.0.0.10
- #1 Server Container binds onto port 5432 #2 Client Container connects to 127.</description>
+      <description>&lt;h2 id=&#34;how-does-it-work-without-flannel&#34;&gt;How does it work without Flannel&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;Assumption: I&amp;rsquo;m using host networking through these examples. You could utilize docker network for example, but to make it simple I wanted to stick to the fact below&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;container network = host/node network&lt;/code&gt;&lt;/p&gt;&#xA;&lt;p&gt;If there was no Flannel, connection between containers would need to happen by directly connecting to the specific port that container is binding to&lt;/p&gt;&#xA;&lt;p&gt;Like so:&lt;/p&gt;&#xA;&lt;p&gt;#1 Node 10.0.0.10&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;#1 Server Container binds onto port 5432&lt;/li&gt;&#xA;&lt;li&gt;#2 Client Container connects to 127.0.0.1:5432 (Orange connection)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;#2 Node 10.0.0.11&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Flashing Android 7 onto Lenovo A3500-FL (Custom ROM, Recovery)</title>
       <link>https://flicksfix.com/posts/flashing-android-7-lenovo-a3500-fl/</link>
       <pubDate>Thu, 19 Aug 2021 15:17:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/flashing-android-7-lenovo-a3500-fl/</guid>
-      <description>Long time ago I bought a tablet Lenovo A3500-FL. It&amp;rsquo;s really old tablet but still works suprisingly well. I thought about maybe having it working as a mobile terminal or Home Assistant Dashboard.
-It only has offical upgrade to Android 4.4.2 which is really old and applications might not be targeting it anymore. According to XDA article only 4% of devices are still running Android that old (and 5,9% culminative of previous versions and this one).</description>
+      <description>&lt;p&gt;Long time ago I bought a tablet &lt;a href=&#34;https://www.gsmarena.com/lenovo_a7_50_a3500-6280.php&#34;&gt;Lenovo A3500-FL&lt;/a&gt;.&#xA;It&amp;rsquo;s really old tablet but still works suprisingly well. I thought about maybe having it working as a mobile terminal or &lt;a href=&#34;https://community.home-assistant.io/t/best-option-to-run-dashboard-on-tablet/174802&#34;&gt;Home Assistant Dashboard&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;It only has offical upgrade to Android 4.4.2 which is really old and applications might not be targeting it anymore. According to &lt;a href=&#34;https://www.xda-developers.com/android-version-distribution-statistics-android-studio/&#34;&gt;XDA article&lt;/a&gt; only 4% of devices are still running Android that old (and 5,9% culminative of previous versions and this one).&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>K3s for Home Server the Easy Way pt. 1 - SSO, external access, traefik</title>
       <link>https://flicksfix.com/posts/k3s-for-home-server-the-easy-way-pt-1/</link>
       <pubDate>Sat, 14 Aug 2021 09:30:13 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/k3s-for-home-server-the-easy-way-pt-1/</guid>
-      <description>I&amp;rsquo;ve always wanted to have my own home server. I&amp;rsquo;ve even bought Intel NUC for that which I intended to use, but I never got around to configuring it properly so it has gathered dust while not in use.
-But in motivation strike, I decided to finally get around to do it, and implement it.
-Infra automation not always the best way to move forward First of all, I don&amp;rsquo;t want to be it a maintanence burden at all.</description>
+      <description>&lt;p&gt;I&amp;rsquo;ve always wanted to have my own home server. I&amp;rsquo;ve even bought Intel NUC for that which I intended to use, but I never got around to configuring it properly so it has gathered dust while not in use.&lt;/p&gt;&#xA;&lt;p&gt;But in motivation strike, I decided to finally get around to do it, and implement it.&lt;/p&gt;&#xA;&lt;h2 id=&#34;infra-automation-not-always-the-best-way-to-move-forward&#34;&gt;Infra automation not always the best way to move forward&lt;/h2&gt;&#xA;&lt;p&gt;First of all, I don&amp;rsquo;t want to be it a maintanence burden at all. With that comes also the need to be able to recover from possible hardware failure easily (and by that I mean all the configuration has to be available somewhere without much manual work).&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Living in the IDE - or Why I Really Like HCL and Loathe YAML</title>
       <link>https://flicksfix.com/posts/living-in-the-ide/</link>
       <pubDate>Thu, 05 Aug 2021 17:07:59 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/living-in-the-ide/</guid>
-      <description>There are things that I enjoy when working as a professional. One of them is that when the tooling is so good that it just makes want to write the code. Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.
-An example of that you can find below
- Autocomplete works out of the box, no configuration needed   One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!</description>
+      <description>&lt;p&gt;There are things that I enjoy when working as a professional.&#xA;One of them is that when the tooling is so good that it just makes want to write the code.&#xA;Example of state-of-the-art integration of IDE into a language is what Hashicorp has done to the Terraform and its integration with IntelliJ IDEA.&lt;/p&gt;&#xA;&lt;p&gt;An example of that you can find below&lt;/p&gt;&#xA;&lt;figure&gt;&lt;img src=&#34;autocomplete-works-out-of-the-box.png&#34;style=&#34;&#34;&#xA;    /&gt;&lt;figcaption&gt;&#xA;            &lt;h4&gt;Autocomplete works out of the box, no configuration needed&lt;/h4&gt;&#xA;        &lt;/figcaption&gt;&#xA;&lt;/figure&gt;&#xA;&lt;p&gt;One might say &amp;ldquo;yeah, its just a simple gimmick, it will fall apart for more complex things!&amp;rdquo; like it often can be the case with dynamic languages.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Infra as a Code Is Cloud Lock-In</title>
       <link>https://flicksfix.com/posts/infra-as-a-code-is-cloud-lock-in/</link>
       <pubDate>Wed, 04 Aug 2021 20:23:53 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/infra-as-a-code-is-cloud-lock-in/</guid>
-      <description>UPDATE (2021-08-06): In a hindsight I think I choose wrong title to describe the concept. More appropriate would be &amp;ldquo;Modern infra automation state management is gateway drug for using more cloud provided services&amp;rdquo; or something along these lines. Initial thought on title came from the fact that I considered terraform/pulumi to be truly &amp;ldquo;Infra as a code&amp;rdquo; solution, while Ansible (second tool that I use for automation) being subpar in that experience (and hence more of &amp;ldquo;commands over SSH&amp;rdquo; thing than true infra state manager).</description>
+      <description>&lt;p&gt;UPDATE (2021-08-06): In a hindsight I think I choose wrong title to describe the concept. More appropriate would be &amp;ldquo;Modern infra automation state management is gateway drug for using more cloud provided services&amp;rdquo; or something along these lines. Initial thought on title came from the fact that I considered terraform/pulumi to be truly &amp;ldquo;Infra as a code&amp;rdquo; solution, while Ansible (second tool that I use for automation) being subpar in that experience (and hence more of &amp;ldquo;commands over SSH&amp;rdquo; thing than true infra state manager).&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>No Idea Where to Live</title>
       <link>https://flicksfix.com/posts/no-idea-where-to-live/</link>
       <pubDate>Wed, 04 Aug 2021 13:38:41 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/no-idea-where-to-live/</guid>
-      <description>Intro For unfamiliar with Polish economy For the context of this post - I currently live by renting a flat in Warsaw, almost by the city border (Far end of Ursynów district). See the attached view for having a context
- Here is how it looks like   I&amp;rsquo;ve pretty close connection to metro line (which to say is impressive here as Warsaw has only two metro lines).
-Rent market !</description>
+      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;&#xA;&lt;h4 class=&#34;subtitle is-5&#34;&gt;For unfamiliar with Polish economy&lt;/h4&gt;&#xA;&lt;p&gt;For the context of this post - I currently live by renting a flat in Warsaw, almost by the city border (Far end of Ursynów district). See the attached view for having a context&lt;/p&gt;&#xA;&lt;figure&gt;&lt;img src=&#34;https://flicksfix.com/no-idea-where-to-live/warsaw-overview.png&#34;style=&#34; max-height:700px;&#34;&#xA;    /&gt;&lt;figcaption&gt;&#xA;            &lt;h4&gt;Here is how it looks like&lt;/h4&gt;&#xA;        &lt;/figcaption&gt;&#xA;&lt;/figure&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve pretty close connection to metro line (which to say is impressive here as Warsaw has &lt;a href=&#34;https://www.metro.waw.pl/metro-w-warszawie&#34;&gt;only two metro lines&lt;/a&gt;).&lt;/p&gt;&#xA;&lt;h3 id=&#34;rent-market&#34;&gt;Rent market&lt;/h3&gt;&#xA;&lt;p&gt;&lt;strong&gt;! Disclaimer:&lt;/strong&gt; I&amp;rsquo;m not an expert in real estate market - these numbers are pulled out of thin air according to my knowledge when I searched for flat recently. Don&amp;rsquo;t treat it as source of truth&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>tfui</title>
       <link>https://flicksfix.com/projects/tfui/</link>
       <pubDate>Wed, 30 Dec 2020 00:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/tfui/</guid>
-      <description>Interactive terraform console UI for managing state (mainly renaming variables)</description>
+      <description>&lt;p&gt;Interactive terraform console UI for managing state (mainly renaming variables)&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Prototyping ESP32 PWM LED Controller for Home Assistant</title>
       <link>https://flicksfix.com/posts/esp32-pwm-driver-prototype/</link>
       <pubDate>Sat, 14 Nov 2020 10:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/esp32-pwm-driver-prototype/</guid>
-      <description>After spending a couple of days laying in my bed with absolute no motivation at all to do anything I&amp;rsquo;ve decided to do anything that will bring me from the lair of despair.
-COVID situation here in Poland at the moment of writing the post is not really great, there is absolutely nothing to do outside because everything is cancelled.
-I can either tinker in my &amp;ldquo;electronic workshop&amp;rdquo; or do programming which I couldn&amp;rsquo;t really keep motivation for.</description>
+      <description>&lt;p&gt;After spending a couple of days laying in my bed with absolute no motivation at all to do anything I&amp;rsquo;ve decided to do anything that will bring me from the lair of despair.&lt;/p&gt;&#xA;&lt;p&gt;COVID situation here in Poland at the moment of writing the post is not really great, there is absolutely nothing to do outside because everything is cancelled.&lt;/p&gt;&#xA;&lt;p&gt;I can either tinker in my &amp;ldquo;electronic workshop&amp;rdquo; or do programming which I couldn&amp;rsquo;t really keep motivation for.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Gemrabot</title>
       <link>https://flicksfix.com/projects/gemrabot/</link>
       <pubDate>Sat, 29 Aug 2020 00:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/gemrabot/</guid>
-      <description>Gitlab Merge Request Bot that allows interactive approval using slack (ChatOps)</description>
+      <description>&lt;p&gt;Gitlab Merge Request Bot that allows interactive approval using slack (ChatOps)&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Threedverse</title>
       <link>https://flicksfix.com/projects/threedverse/</link>
       <pubDate>Fri, 12 Jun 2020 00:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/threedverse/</guid>
-      <description>My attempt to make alternative for hosting 3D printing content (*.stl)</description>
+      <description>&lt;p&gt;My attempt to make alternative for hosting 3D printing content (*.stl)&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Hash Sum Mismatch – trouble when using WSL2 and VirtualBox</title>
       <link>https://flicksfix.com/posts/hash-sum-mismatch-virtualbox/</link>
       <pubDate>Wed, 20 May 2020 10:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/hash-sum-mismatch-virtualbox/</guid>
-      <description>When I was writing a tutorial regarding usage of VirtualBox to compile Marlin firmware (for 3D Printers) I came across following issue:
-E: Failed to fetch store:/var/lib/apt/lists/partial/jp.archive.ubuntu.com_ubuntu_dists_focal_main_binary-amd64_Packages.xz Hash Sum mismatch Hashes of expected file: - Filesize:5826751 [weak] - SHA256:af226b4496cbb524bd4814d102047ae77769836203274dffc91cb543d5da13cc - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak] - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak] Hashes of received file: - SHA256:e2c7fc5a2d86f75f03612fec614dcf84d3d502976558fbe40928c1dd120bb05e - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak] - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak] - Filesize:5826751 [weak] Last modification reported: Thu, 23 Apr 2020 16:40:26 +0000 Release file created at: Thu, 23 Apr 2020 17:33:17 +0000 This error was really strange because SHA256 is the only one that differs.</description>
+      <description>&lt;p&gt;When I was writing a tutorial regarding usage of VirtualBox to compile Marlin firmware (for 3D Printers) I came across following issue:&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;E: Failed to fetch store:/var/lib/apt/lists/partial/jp.archive.ubuntu.com_ubuntu_dists_focal_main_binary-amd64_Packages.xz  Hash Sum mismatch&#xA;   Hashes of expected file:&#xA;    - Filesize:5826751 [weak]&#xA;    - SHA256:af226b4496cbb524bd4814d102047ae77769836203274dffc91cb543d5da13cc&#xA;    - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak]&#xA;    - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak]&#xA;   Hashes of received file:&#xA;    - SHA256:e2c7fc5a2d86f75f03612fec614dcf84d3d502976558fbe40928c1dd120bb05e&#xA;    - SHA1:aef5c36ce45bd5c3154a1bb03c62b6cfb33e2bc6 [weak]&#xA;    - MD5Sum:7ef83228ec207df10acac48fbdd81112 [weak]&#xA;    - Filesize:5826751 [weak]&#xA;   Last modification reported: Thu, 23 Apr 2020 16:40:26 +0000&#xA;   Release file created at: Thu, 23 Apr 2020 17:33:17 +0000&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This error was really strange because SHA256 is the only one that differs.&#xA;(&lt;a href=&#34;https://askubuntu.com/questions/1235914/hash-sum-mismatch-error-due-to-identical-sha1-and-md5-but-different-sha256/1241893#1241893&#34;&gt;See related post on AskUbuntu&lt;/a&gt;)&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>paperless (fork)</title>
       <link>https://flicksfix.com/projects/paperless-fork/</link>
       <pubDate>Sat, 15 Feb 2020 10:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/paperless-fork/</guid>
-      <description>My FORK of paperless which adds Azure OCR service for better OCR</description>
+      <description>&lt;p&gt;My FORK of paperless which adds Azure OCR service for better OCR&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Docker swarm cluster on single laptop home lab running Proxmox VE</title>
       <link>https://flicksfix.com/posts/docker-swarm-cluster/</link>
       <pubDate>Mon, 06 Jan 2020 10:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/posts/docker-swarm-cluster/</guid>
-      <description>This is my first blog post about running anything related to home lab. As I have already done some work before to have Proxmox VE running with connection to the router — I will be explaining that in later posts if I find time or motivation to do so.
-Planned:  I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as Swarm Nodes.</description>
+      <description>&lt;p&gt;This is my first blog post about running anything related to home lab.&#xA;As I have already done some work before to have Proxmox VE running with connection to the router —&#xA;I will be explaining that in later posts if I find time or motivation to do so.&lt;/p&gt;&#xA;&lt;h2 id=&#34;planned&#34;&gt;&lt;strong&gt;Planned&lt;/strong&gt;:&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;I want to have 3 nodes of VM, with Ubuntu Server running on them, referring to them as &lt;em&gt;Swarm Nodes.&lt;/em&gt;&lt;/li&gt;&#xA;&lt;li&gt;I will be using Ansible past the point when I have a fresh Ubuntu installed (installation will be manual, as this is really complicated to automate for the beginner)&lt;/li&gt;&#xA;&lt;li&gt;I will connect &lt;em&gt;swarm nodes&lt;/em&gt; with docker swarm&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;strong&gt;In the future:&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Scooter-Board-MCU</title>
       <link>https://flicksfix.com/projects/scooter-board-mcu/</link>
       <pubDate>Tue, 29 Oct 2019 00:00:00 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/scooter-board-mcu/</guid>
-      <description>My attempt on reverse engineering Xiaomi M365 scooter UART communication</description>
+      <description>&lt;p&gt;My attempt on reverse engineering Xiaomi M365 scooter UART communication&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>langenv (concept)</title>
       <link>https://flicksfix.com/projects/langenv/</link>
       <pubDate>Sun, 05 Aug 2018 17:50:17 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/langenv/</guid>
-      <description>Concept of making a universal language management tool</description>
+      <description>&lt;p&gt;Concept of making a universal language management tool&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>arduino-fft-visualizer</title>
       <link>https://flicksfix.com/projects/arduino-visualizer/</link>
       <pubDate>Sat, 09 May 2015 09:40:23 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/arduino-visualizer/</guid>
-      <description>Ancient project for making LEDs flash according to given frequency played in my speaker using FFT</description>
+      <description>&lt;p&gt;Ancient project for making LEDs flash according to given frequency played in my speaker using FFT&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Trellobot</title>
       <link>https://flicksfix.com/projects/trellobot/</link>
       <pubDate>Fri, 18 Apr 2014 09:23:30 +0200</pubDate>
-      
       <guid>https://flicksfix.com/projects/trellobot/</guid>
-      <description>My oldest public project, a bot which sends notifications about terllo events on slack</description>
+      <description>&lt;p&gt;My oldest public project, a bot which sends notifications about terllo events on slack&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

@@ -4,7 +4,8 @@
     <title>Tags on Writing about code, electronics and other stuff</title>
     <link>https://flicksfix.com/tags/</link>
     <description>Recent content in Tags on Writing about code, electronics and other stuff</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://flicksfix.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="https://flicksfix.com/tags/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
