@@ -7,7 +7,7 @@
     <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/posts/</loc>
-    <lastmod>2026-02-19T11:00:00+02:00</lastmod>
+    <lastmod>2026-03-19T10:00:00+02:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -20,12 +20,17 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</loc>
-    <lastmod>2026-02-19T11:00:00+02:00</lastmod>
+    <loc>https://flicksfix.com/posts/how-to-rotate-istio-ca-cert/</loc>
+    <lastmod>2026-03-19T10:00:00+02:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://flicksfix.com/</loc>
+    <lastmod>2026-03-19T10:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://flicksfix.com/posts/navigating-in-the-age-of-ai/</loc>
     <lastmod>2026-02-19T11:00:00+02:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

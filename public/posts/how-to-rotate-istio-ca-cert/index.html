@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>How to rotate Istio TLS certificates without downtime in ambient mode | Writing about code, electronics and other stuff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="This is rather short note on how to do the certification rotation, as official istio documentation is really sparse on details.
+This has been tested on Istio 1.28.1, in Kind cluster, running ambient mode with ztunnel and waypoints.
+Issue I&rsquo;ve been facing was that whenever I tried to replace the CA Certificates used by istio, Istio Waypoints were unable to communicate with Istio Ztunnel.
+It turns out that istio has two options that has to be enabled to make the transition seamless, and you also need to know how to properly modify the certificate chain that you&rsquo;re providing.">
+    <meta name="generator" content="Hugo 0.152.2">
+    
+    <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+
+
+
+    
+      
+
+    
+
+    
+
+	
+
+<link rel="stylesheet" href="https://flicksfix.com/sass/bulma-custom.6c2603d39b17f27aeac9cdc651e80f83c5ce3c6592db93c0440792959856ff67.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script data-goatcounter="https://flicksfixcounter.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+  </head>
+
+  <body >
+    <div class="is-hidden-print">
+      <h2 class="title is-2 block has-text-centered mt-6"><a class="is-hovered has-text-black" href="/">Marcin "Gordon" Gordziejewski</a></h2>
+<h2 class="subtitle is-4 has-text-centered">Writing about code, electronics and other stuff</h2>
+<nav>
+    <ul class="columns">
+        
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/about/">About Me</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-ghost  is-fullwidth " href="/posts/">Blog</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/projects/">Projects</a>
+        </li>
+        
+
+        <li class="column">
+            <a class="button is-text  is-fullwidth " href="/contact/">Contact</a>
+        </li>
+        
+    </ul>
+</nav>
+<hr/>
+    </div>
+    <main role="main" class="container pl-4 pr-4">
+      
+<section id="main">
+  <h1 class="title is-2">How to rotate Istio TLS certificates without downtime in ambient mode</h1>
+  <div>
+        <article class="content has-text-justified">
+           <p>This is rather short note on how to do the certification rotation, as official istio documentation is really sparse on details.</p>
+<p>This has been tested on Istio 1.28.1, in Kind cluster, running ambient mode with ztunnel and waypoints.</p>
+<p>Issue I&rsquo;ve been facing was that whenever I tried to replace the CA Certificates used by istio, Istio Waypoints were unable to communicate with Istio Ztunnel.</p>
+<p>It turns out that istio has two options that has to be enabled to make the transition seamless, and you also need to know how to properly modify the certificate chain that you&rsquo;re providing.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>You have to enable two options in istio before you&rsquo;re able to do it successfully.</p>
+<p>First is <a href="https://istio.io/latest/docs/reference/commands/pilot-agent/#istio-multiroot-mesh">ISTIO_MULTIROOT_MESH</a>.
+This allows istio to properly recognize multiple root certificates as trusted. Without that option, Istio only trusts the first root certificate it has in its configuration (as defined in <code>root-cert.pem</code> that you put in <code>cacerts</code> secret).</p>
+<p>Second option, is <a href="https://istio.io/latest/docs/reference/commands/pilot-agent/#proxy-config-xds-agent">PROXY_CONFIG_XDS_AGENT</a> which is not strictly necessary, but makes it much easier and smoother than if you would do without it. If you don&rsquo;t set that option, you will have to make sure that you restart all istio envoy proxies, that is waypoints, gateways, sidecars, what have you, because they won&rsquo;t recognize new certificate.</p>
+<h2 id="applying-the-new-ca-certificate">Applying the new CA Certificate</h2>
+<p>Apart from that, follow the procedure found in <a href="https://istio.io/latest/docs/tasks/security/cert-management/plugin-ca-cert/">Istio/Plug in CA Certificates</a>. Make sure you pull the currently used root certificate with <code>tools/certs/Makefile.k8s.mk</code>. You will need it later.</p>
+<p>Tl;dr procedure is:</p>
+<ol>
+<li>Generate the new root certificate</li>
+<li>Generate the intermediate certificate, which you will likely need if you do multi cluster mesh.</li>
+<li>Generate the bundle with <code>&lt;cluster_name&gt;-cacerts</code> makefile task.</li>
+<li>In the generated bundle, copy existing public certificate of currently used root CA and append it to <code>root-cert.pem</code></li>
+</ol>
+<p>Once you apply the <code>cacerts</code> secret, restart <code>istiod</code> first, then <code>ztunnel</code> daemonset, and then all the envoy istio proxies (the last step is probably optional with <code>PROXY_CONFIG_XDS_AGENT</code>).</p>
+<p>Useful command to ensure that your certificates are correctly configured:</p>
+<pre tabindex="0"><code>&gt; istioctl zc certificates &lt;your ztunnel pod&gt;
+
+CERTIFICATE NAME                                        TYPE             STATUS        VALID CERT     SERIAL NUMBER                                NOT AFTER                NOT BEFORE
+spiffe://cluster.local/ns/test-server-ns/sa/httpbin     Leaf             Available     true           1c7650353c6c0a4052717827d059d05d             2026-03-20T13:01:53Z     2026-03-19T12:59:53Z
+spiffe://cluster.local/ns/test-server-ns/sa/httpbin     Intermediate     Available     true           251091b4f1c4271ee0104c3b5148d6231505d08e     2036-03-16T12:59:51Z     2026-03-19T12:59:51Z
+spiffe://cluster.local/ns/test-server-ns/sa/httpbin     Intermediate     Available     true           11334def88f8e6fe9497351504f9db7abe23006a     2036-03-16T12:59:42Z     2026-03-19T12:59:42Z
+spiffe://cluster.local/ns/test-server-ns/sa/httpbin     Root             Available     true           11334def88f8e6fe9497351504f9db7abe23006a     2036-03-16T12:59:42Z     2026-03-19T12:59:42Z
+spiffe://cluster.local/ns/test-server-ns/sa/httpbin     Root             Available     true           5a17f42f44e6f1fceab06f80b199831cfd3549f2     2036-03-16T11:50:36Z     2026-03-19T11:50:36Z
+</code></pre><p>You should see two root certificates, just the ones that you configured. You might need to check multiple ztunnel pods, because if you don&rsquo;t have traffic on a given node - they won&rsquo;t contain any configuration.</p>
+<p>This should help you successfully replace existing CA Certificate with a new one, without losing trust in your mTLS mesh traffic.</p>
+
+        </article>
+  </div>
+</section>
+
+    </main>
+    <hr/>
+    
+  </body>
+</html>
