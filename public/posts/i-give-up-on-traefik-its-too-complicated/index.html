@@ -27,7 +27,7 @@ spec:
     - kind: TraefikService
       name: api@internal
 Which does what it says - matches /dashboard and directs that to internal api which resolves to showing a dashboard when you access /dashboard/ (mind the slash).">
-    <meta name="generator" content="Hugo 0.152.2">
+    <meta name="generator" content="Hugo 0.159.0">
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -94,7 +94,7 @@ Which does what it says - matches /dashboard and directs that to internal api wh
 <h2 id="trying-to-setup-traefik-from-scratch">Trying to setup traefik from scratch</h2>
 <p>I&rsquo;ve been working on setting up traefik from scratch as an exercise. I got to the point where it&rsquo;s all nice and running and then there is this.</p>
 <p>I&rsquo;ve created IngressRoute</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">IngressRoute</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:

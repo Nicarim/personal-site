@@ -11,7 +11,7 @@ I truly hate helm. It&rsquo;s not because it&rsquo;s a bad idea, core idea of He
 But I hate it to the heart.
 Why you might ask?
 It&rsquo;s because most of the time Helm tends to become total customization of the chart. Literally. If you try to use any off the shelf helm charts you will often meet with following dilemma:">
-    <meta name="generator" content="Hugo 0.152.2">
+    <meta name="generator" content="Hugo 0.159.0">
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -152,7 +152,7 @@ It&rsquo;s because most of the time Helm tends to become total customization of 
 ├── Pulumi.yaml
 └── tsconfig.json
 </code></pre><p>This is the project structure that got generated.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">as</span> <span style="color:#a6e22e">k8s</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;@pulumi/kubernetes&#34;</span>;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">as</span> <span style="color:#a6e22e">k8s</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;@pulumi/kubernetes&#34;</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">appLabels</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">app</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;nginx&#34;</span> };
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">deployment</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">apps</span>.<span style="color:#a6e22e">v1</span>.<span style="color:#a6e22e">Deployment</span>(<span style="color:#e6db74">&#34;nginx&#34;</span>, {
@@ -175,13 +175,13 @@ It&rsquo;s because most of the time Helm tends to become total customization of 
 <h3 id="adding-provider-to-resources">Adding provider to resources</h3>
 <p>For resources to use the provider, I need to add that provider as <code>CustomResourceOptions</code>, it&rsquo;s third argument in <code>Deployment</code> specification. It accepts key called <code>provider</code> with value of provider object that we want to use.</p>
 <p>This is final code</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>import * as k8s from &#34;@pulumi/kubernetes&#34;;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>import * as k8s from &#34;@pulumi/kubernetes&#34;;
 </span></span><span style="display:flex;"><span>import * as kx from &#34;@pulumi/kubernetesx&#34;;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+const provider = new k8s.Provider(&#34;k3d-testing&#34;, {
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+    renderYamlToDirectory: &#34;output&#34;,
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+})
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>const appLabels = { app: &#34;nginx&#34; };
 </span></span><span style="display:flex;"><span>const deployment = new k8s.apps.v1.Deployment(&#34;nginx&#34;, {
 </span></span><span style="display:flex;"><span>    spec: {
@@ -193,7 +193,7 @@ It&rsquo;s because most of the time Helm tends to become total customization of 
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+}, { provider });
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>export const name = deployment.metadata.name;
 </span></span></code></pre></div><h3 id="generating-yaml">Generating YAML</h3>
 <p>Now I was able to run <code>pulumi up</code> and after confirming the plan I&rsquo;ve got output directory with YAML files:</p>
@@ -229,11 +229,11 @@ Resources:
 <h3 id="making-the-name-of-resource-static">Making the name of resource static</h3>
 <p>So that is no good, I want to keep track of the same nginx across changes that I make.</p>
 <p>Let&rsquo;s try to add <code>metadata.name</code> to our deployment.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>const deployment = new k8s.apps.v1.Deployment(&#34;nginx&#34;, {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>const deployment = new k8s.apps.v1.Deployment(&#34;nginx&#34;, {
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+    metadata: {
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        name: &#34;nginx&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+   },
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>    spec: {
+</span></span></span><span style="display:flex;"><span>    spec: {
 </span></span><span style="display:flex;"><span>        selector: { matchLabels: appLabels },
 </span></span><span style="display:flex;"><span>        replicas: 1,
 </span></span><span style="display:flex;"><span>        template: {
@@ -255,21 +255,21 @@ Resources:
 <p>First I&rsquo;ve created a directory structure of <code>k8s_manifests/argocd</code> in our project&rsquo;s root.</p>
 <p>Then I downloaded <a href="https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml">the manifest</a> from the repository of ArgoCD. As of writing that is <code>v2.1.1</code> version. I&rsquo;ve renamed it to <code>install-v2-1-1.yaml</code> to just reflect the version we will be using.</p>
 <p>Here is the code to import the manifest as Pulumi object:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">as</span> <span style="color:#a6e22e">k8s</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;@pulumi/kubernetes&#34;</span>;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">as</span> <span style="color:#a6e22e">k8s</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;@pulumi/kubernetes&#34;</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;</span>,
 </span></span><span style="display:flex;"><span>});
 </span></span></code></pre></div><p>Let&rsquo;s generate it directly to our output dir.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a6e22e">&gt; pulumi up          
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a6e22e">&gt; pulumi up          
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Previewing update (dev):
 </span></span><span style="display:flex;"><span>     Type                                                 Name                         
 </span></span><span style="display:flex;"><span>     pulumi:pulumi:Stack                                  pulumi-kubernetes-dev         
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+   └─ kubernetes:yaml:ConfigFile                        argocd                      
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      ├─ kubernetes:core/v1:Service                           argocd-server-metrics   
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      ├─ kubernetes:core/v1:ConfigMap                         argocd-cmd-params-cm  
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> # (... many more resources later ...)
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>Resources:
@@ -335,7 +335,7 @@ output
 <p>I&rsquo;ll be quite honest that this function is quite complicated to me at first and I&rsquo;ve had need to reread the documentation over and over since it doesn&rsquo;t provide anymore examples than what you&rsquo;ve seen.</p>
 <p>But I was able to find <a href="https://pulumi.awsworkshop.io/additional-content/150_deploying_argocd_to_eks/30_declare_argocd_helm_chart.html">another example on awsworkshop.io</a> which helped me understand it a little bit better.</p>
 <p>Here is my explanation on how to use it:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">transformations</span><span style="color:#f92672">:</span> [
 </span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">obj</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
@@ -345,7 +345,7 @@ output
 </span></span><span style="display:flex;"><span>});
 </span></span></code></pre></div><p>Key <code>transformations</code> accepts a list of functions (anonymous, named, any), and every function will be called for every object generated by the resource. In case of <code>ConfigFile</code> it calls it for every resource found in the manifest.</p>
 <p>Example <code>obj</code> that you will on pulumi run:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">apiVersion</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;apps/v1&#39;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">kind</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Deployment&#39;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> {
@@ -364,7 +364,7 @@ output
 </span></span></code></pre></div><p>That is a single call of your transformation function.</p>
 <p>Now what we need to do is wait for the function to be called with <code>kind: Deployment</code> and make our change to the object.</p>
 <p>To do that we can write following code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>const example = new k8s.yaml.ConfigFile(&#34;argocd&#34;, {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>const example = new k8s.yaml.ConfigFile(&#34;argocd&#34;, {
 </span></span><span style="display:flex;"><span>    file: &#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;,
 </span></span><span style="display:flex;"><span>    transformations: [
 </span></span><span style="display:flex;"><span>        (obj: any) =&gt; {
@@ -375,66 +375,66 @@ output
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+                   operator: &#34;Exists&#34;,
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+                   effect: &#34;NoSchedule&#34;,
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+               }]
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>            }
+</span></span></span><span style="display:flex;"><span>            }
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    ]
 </span></span><span style="display:flex;"><span>});
 </span></span></code></pre></div><p>This will generate following YAML diff (difference between previous as-is and modified YAML)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>diff --git a/output/1-manifest/deployment-default-argocd-dex-server.yaml b/output/1-manifest/deployment-default-argocd-dex-server.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>diff --git a/output/1-manifest/deployment-default-argocd-dex-server.yaml b/output/1-manifest/deployment-default-argocd-dex-server.yaml
 </span></span><span style="display:flex;"><span>index 16c5463..13ef072 100644
 </span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-dex-server.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-dex-server.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -63,6 +63,10 @@ spec:
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>         - mountPath: /tmp
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-dex-server.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">@@ -63,6 +63,10 @@ spec:
+</span></span></span><span style="display:flex;"><span>         - mountPath: /tmp
 </span></span><span style="display:flex;"><span>           name: dexconfig
 </span></span><span style="display:flex;"><span>       serviceAccountName: argocd-dex-server
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      tolerations:
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      - effect: NoSchedule
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        key: example-key
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        operator: Exists
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>       volumes:
+</span></span></span><span style="display:flex;"><span>       volumes:
 </span></span><span style="display:flex;"><span>       - emptyDir: {}
 </span></span><span style="display:flex;"><span>         name: static-files
 </span></span><span style="display:flex;"><span>diff --git a/output/1-manifest/deployment-default-argocd-redis.yaml b/output/1-manifest/deployment-default-argocd-redis.yaml
 </span></span><span style="display:flex;"><span>index e281df7..5e35df1 100644
 </span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-redis.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-redis.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -49,3 +49,7 @@ spec:
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>         runAsNonRoot: true
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-redis.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">@@ -49,3 +49,7 @@ spec:
+</span></span></span><span style="display:flex;"><span>         runAsNonRoot: true
 </span></span><span style="display:flex;"><span>         runAsUser: 999
 </span></span><span style="display:flex;"><span>       serviceAccountName: argocd-redis
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      tolerations:
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      - effect: NoSchedule
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        key: example-key
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        operator: Exists
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>diff --git a/output/1-manifest/deployment-default-argocd-repo-server.yaml b/output/1-manifest/deployment-default-argocd-repo-server.yaml
+</span></span></span><span style="display:flex;"><span>diff --git a/output/1-manifest/deployment-default-argocd-repo-server.yaml b/output/1-manifest/deployment-default-argocd-repo-server.yaml
 </span></span><span style="display:flex;"><span>index 67f93bd..bb6c828 100644
 </span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-repo-server.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-repo-server.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -153,6 +153,10 @@ spec:
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>           name: argocd-repo-server-tls
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-repo-server.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">@@ -153,6 +153,10 @@ spec:
+</span></span></span><span style="display:flex;"><span>           name: argocd-repo-server-tls
 </span></span><span style="display:flex;"><span>         - mountPath: /tmp
 </span></span><span style="display:flex;"><span>           name: tmp
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      tolerations:
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      - effect: NoSchedule
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        key: example-key
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        operator: Exists
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>       volumes:
+</span></span></span><span style="display:flex;"><span>       volumes:
 </span></span><span style="display:flex;"><span>       - configMap:
 </span></span><span style="display:flex;"><span>           name: argocd-ssh-known-hosts-cm
 </span></span><span style="display:flex;"><span>diff --git a/output/1-manifest/deployment-default-argocd-server.yaml b/output/1-manifest/deployment-default-argocd-server.yaml
 </span></span><span style="display:flex;"><span>index d3d0776..80d3a5b 100644
 </span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/output/1-manifest/deployment-default-argocd-server.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-server.yaml
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -219,6 +219,10 @@ spec:
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>         - mountPath: /tmp
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+++ b/output/1-manifest/deployment-default-argocd-server.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">@@ -219,6 +219,10 @@ spec:
+</span></span></span><span style="display:flex;"><span>         - mountPath: /tmp
 </span></span><span style="display:flex;"><span>           name: tmp
 </span></span><span style="display:flex;"><span>       serviceAccountName: argocd-server
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      tolerations:
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+      - effect: NoSchedule
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        key: example-key
 </span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+        operator: Exists
-</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span>       volumes:
+</span></span></span><span style="display:flex;"><span>       volumes:
 </span></span><span style="display:flex;"><span>       - emptyDir: {}
 </span></span><span style="display:flex;"><span>         name: plugins-home
 </span></span></code></pre></div><p>Now that&rsquo;s pretty cool. But the code is quite ugly - there is so many ifs and it is not apparent on how it works at a first glance.</p>
@@ -444,17 +444,17 @@ output
 Strength of the programming languge at our disposal is that we can do whatever we want. (Of course that&rsquo;s also our weakness, you can do <em>whatever you want</em>)</p>
 <p>But FWIW let&rsquo;s make a transformation mixin. We will call it <code>AddDeploymentTolerationMixin</code> that will add to all deployments tolerations that we specify.</p>
 <p>What we can do is we can return a prepared closure with arguments that we specify.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">AddDeploymentTolerationMixin</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">toleration</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">AddDeploymentTolerationMixin</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">toleration</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">obj</span>: <span style="color:#66d9ef">any</span>) <span style="color:#f92672">=&gt;</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">kind</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Deployment&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">apiVersion</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;apps/v1&#34;</span>) {
 </span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Here is our deployment, let&#39;s add toleration
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">spec</span>.<span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">spec</span>.<span style="color:#a6e22e">tolerations</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">toleration</span>]
+</span></span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">spec</span>.<span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">spec</span>.<span style="color:#a6e22e">tolerations</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">toleration</span>]
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>This is our mixin that will add toleration to deployments. It&rsquo;s pretty simple and will do most of the job so we can just forget about its implementation details.</p>
 <p>Now onto the eye candy</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">example</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">yaml</span>.<span style="color:#a6e22e">ConfigFile</span>(<span style="color:#e6db74">&#34;argocd&#34;</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;k8s_manifests/argocd/install-v2-1-1.yaml&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">transformations</span><span style="color:#f92672">:</span> [
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">AddDeploymentTolerationMixin</span>({

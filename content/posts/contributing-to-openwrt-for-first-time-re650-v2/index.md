@@ -117,7 +117,7 @@ I've used picocom with the command `picocom -b 57600 /dev/ttyUSB0`
 
 Before my eyes unleashed everything the device wanted to tell me.
 
-<div style="height: 500px; overflow: auto">{{< gist Nicarim 17fdcd8848b02d2f56adaba29c2d2022>}}</div>
+[Bootlog link](https://gist.github.com/Nicarim/17fdcd8848b02d2f56adaba29c2d2022)
 
 ### Getting root access
 

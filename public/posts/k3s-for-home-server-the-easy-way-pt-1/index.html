@@ -10,7 +10,7 @@
 But in motivation strike, I decided to finally get around to do it, and implement it.
 Infra automation not always the best way to move forward
 First of all, I don&rsquo;t want to be it a maintanence burden at all. With that comes also the need to be able to recover from possible hardware failure easily (and by that I mean all the configuration has to be available somewhere without much manual work).">
-    <meta name="generator" content="Hugo 0.152.2">
+    <meta name="generator" content="Hugo 0.159.0">
     
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
@@ -152,7 +152,7 @@ They also have shared http/https server, which allows reverse_proxy functionalit
 <li>Create configuration file <code>frps.ini</code></li>
 </ul>
 <p>My configuration file for <code>frp server</code> has following configuration:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[common]</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[common]</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind_addr</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;external_ip&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind_port</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&lt;port_for_frp_server&gt;</span>
 </span></span><span style="display:flex;"><span>
@@ -178,8 +178,8 @@ As I only had a single port reserved on shared hosting, it was great for that pu
 <p>For going back to frp session you can <code>screen -r frp_server</code></p>
 <h4 id="setting-up-reverse-proxy-for-frp">Setting up reverse proxy for frp</h4>
 <p>Because I used shell provider, they&rsquo;ve had a nice propertiary GUI for setting up the reverse proxy. Equivalent of that setup would be something along this in <code>nginx</code> (assuming nginx and frp are running on the same host).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span>  <span style="color:#66d9ef">server</span> { <span style="color:#75715e"># simple reverse-proxy
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">listen</span>  <span style="color:#ae81ff">80</span>;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span>  <span style="color:#66d9ef">server</span> { <span style="color:#75715e"># simple reverse-proxy
+</span></span></span><span style="display:flex;"><span>    <span style="color:#f92672">listen</span>  <span style="color:#ae81ff">80</span>;
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">frp.your_domain.com</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">location</span> <span style="color:#e6db74">/</span> {
@@ -198,7 +198,7 @@ There is also <a href="https://www.cloudflare.com/">cloudflare</a> which acts as
 <h3 id="setting-up-k3s-on-the-home-server">Setting up k3s on the home server</h3>
 <p>I&rsquo;m assuming you&rsquo;ve got the server up and running, configured in your network with private static IP, and that machine has full access to the internet. I personally used Ubuntu 20.04 OS.</p>
 <p>To install k3s on that server, all you have to do is run <a href="https://k3s.io/">commands on the k3s site</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -sfL https://get.k3s.io | sh -
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -sfL https://get.k3s.io | sh -
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Check for Ready node,</span>
 </span></span><span style="display:flex;"><span>takes maybe <span style="color:#ae81ff">30</span> seconds
 </span></span><span style="display:flex;"><span>k3s kubectl get node
@@ -209,9 +209,9 @@ There is also <a href="https://www.cloudflare.com/">cloudflare</a> which acts as
 <p>Doing everything on the server itself can be tedious so we will use external access to kubernetes cluster.
 For that we need to copy a file that was created by k3s in <code>/etc/rancher/k3s/k3s.yaml</code>. For that we can simply do <code>scp &lt;user&gt;@&lt;server&gt;:/etc/rancher/k3s/k3s.yaml .</code> and that will copy the file onto your local machine.</p>
 <p>You also need to change one line in it:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://127.0.0.1:6443</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://127.0.0.1:6443</span>
 </span></span></code></pre></div><p>This needs to be changed to IP address of your home server, in my case it&rsquo;s <code>10.5.10.5</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://10.5.10.5:6443</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://10.5.10.5:6443</span>
 </span></span></code></pre></div><p>Change it like so, and save the file.</p>
 <p>Now you have to install <code>kubectl</code>, just <a href="https://kubernetes.io/docs/tasks/tools/">follow the official guide for your OS</a>. In case of arch linux / manjaro, I used <code>yay kubectl</code> and installed the available package.</p>
 <p>After you get kubectl installed, all that is left to do is to replace your <code>~/.kube/config</code> file with the one you just downloaded from your server. Simply run <code>cp &lt;path_to_k3s.yaml&gt; ~/.kube/config</code>, in case the directory doesn&rsquo;t exist create it using <code>mkdir ~/.kube</code>.</p>
@@ -225,7 +225,7 @@ intel-nuc        Ready    control-plane,master   21h   v1.21.3+k3s1
 </figure></p>
 <p>That means nothing is yet connected to frp and it is just serving the default page. That also means it&rsquo;s working correctly.</p>
 <p>For setting up frp server in the cluster, I created following k8s manifest <code>frpc.yaml</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Namespace</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frp</span>
@@ -294,7 +294,7 @@ This will be even more powerful later on.</p>
 I chose that project, even though it&rsquo;s not yet fully-featured (like <code>Caddy</code>&rsquo;s counterpart) simply due to documented (somehow) way to make it work with <code>traefik</code> (which is built-in to k3s).
 I&rsquo;ll be deploying login portal on <code>/ssoauth</code> endpoint. <strong>Sadly authelia <a href="https://www.authelia.com/docs/configuration/server.html#path">doesn&rsquo;t support</a> multi-level subpaths or dashes</strong></p>
 <h3 id="authelia-deployment-manifest">Authelia deployment manifest</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Namespace</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia</span>
@@ -423,7 +423,7 @@ Without that you will be getting <code>Unauthorized</code> with following error:
 </code></pre><p>Even though that your public endpoint is secured.</p>
 <h5 id="quick-fix-for-trusting-forwarded-headers">Quick fix for trusting forwarded headers</h5>
 <p>Even quickier method, although probably needs to be reapplied every time is to just add <code>- --entryPoints.web.forwardedHeaders.insecure</code> at the end of traefik deployment specification at</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>  <span style="color:#f92672">spec</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>  <span style="color:#f92672">spec</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#f92672">args</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">(...)</span>
@@ -433,7 +433,7 @@ Without that you will be getting <code>Unauthorized</code> with following error:
 In recent kubernetes and traefik versions you can use <code>Ingress</code> directly to achieve that.
 (I&rsquo;m saying that because previously you would have to use annotations for that and they can get really ugly)</p>
 <p>For the ingress object, it can be as simple as that:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
 </span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">networking.k8s.io/v1</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
@@ -474,7 +474,7 @@ Image on their site nicely explains the concept.</p>
 If not, it will redirect for authorization and then let the traffic.</p>
 <p>Principle is pretty simple, and so is the implementation</p>
 <h3 id="middleware-manifest">Middleware manifest</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">traefik.containo.us/v1alpha1</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Middleware</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">authelia-auth</span>
@@ -499,7 +499,7 @@ If not, it will redirect for authorization and then let the traffic.</p>
 <p>If we got some service running in our k3s cluster, for example popular testing container <code>whoami</code>
 I used <a href="https://medium.com/@geraldcroes/kubernetes-traefik-101-when-simplicity-matters-957eeede2cf8">this guide</a> to deploy the whoami <code>Deployment</code> and <code>Service</code>
 Assuming you&rsquo;ve done the same here is how to make it use our middleware.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
 </span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">networking.k8s.io/v1</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
